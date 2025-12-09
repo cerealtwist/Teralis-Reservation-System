@@ -1,0 +1,53 @@
+###############################
+# Java build artifacts
+###############################
+*.class
+*.war
+*.jar
+*.ear
+*.zip
+*.log
+
+###############################
+# VS Code
+###############################
+.vscode/
+.settings/
+.classpath
+.project
+
+###############################
+# OS specific files
+###############################
+.DS_Store
+Thumbs.db
+
+###############################
+# Tomcat generated folders
+###############################
+target/
+out/
+build/
+bin/
+dist/
+
+###############################
+# Keep ONLY runtime libs
+# Ignore Tomcat libraries
+###############################
+# DO NOT ignore lib inside WEB-INF/lib
+# (Your gson + mysql driver must be tracked)
+tomcat*/ 
+apache-tomcat*/
+*/tomcat*/
+**/temp/
+**/work/
+
+###############################
+# Node / NPM (if needed for frontend)
+###############################
+node_modules/
+npm-debug.log
+yarn-error.log
+
+###########
