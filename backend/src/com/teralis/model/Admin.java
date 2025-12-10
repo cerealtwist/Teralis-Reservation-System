@@ -1,13 +1,11 @@
 package com.teralis.model;
 
 public class Admin extends User {
-    private int idAdmin;
-
-    public int getIdAdmin() {
-        return idAdmin;
+  public Admin() {
+        this.role = "admin";
     }
 
-    public void setIdAdmin(int idAdmin) {
-        this.idAdmin = idAdmin;
+    public Admin(int id, String name, String email, String passwordHash) {
+        super(id, name, email, passwordHash, "admin");
     }
 }

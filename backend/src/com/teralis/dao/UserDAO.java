@@ -46,7 +46,7 @@ public class UserDAO {
             PreparedStatement statement = conn.prepareStatement(sql)){
                 statement.setString(1, u.getName());
                 statement.setString(2, u.getEmail());
-                statement.setString(3, u.getPassword());
+                statement.setString(3, u.getPasswordHash());
                 statement.setString(4, u.getRole());
                 
                 return statement.executeUpdate() > 0;
@@ -79,7 +79,7 @@ public class UserDAO {
         u.setId(rs.getInt("id"));
         u.setName(rs.getString("name"));
         u.setEmail(rs.getString("email"));
-        u.setPassword(rs.getString("password"));
+        u.setPasswordHash(rs.getString("password"));
         u.setRole(role);
 
         return u;
