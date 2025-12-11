@@ -64,20 +64,86 @@ public class UserController extends HttpServlet {
 
     // -- POST (Create User) --
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException{
-        HttpSession session = req.getSession(false);
-        String role = (String) session.getAttribute("role");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        if(!"admin".equals(role)) {
-            JsonResponse.error(resp, 403, "Forbidden: Admin only");
+        HttpSession session = req.getSession(false);
+
+        if (session == null || !"admin".equals(session.getAttribute("role"))) {
+            JsonResponse.error(resp, 403, "Forbidden: admin only");
             return;
         }
 
-        User u = JsonResponse.readBody(req, User.class);
+        User newUser = JsonResponse.readBody(req, User.class);
 
-        if (userDAO.createUser(u)){
-
+        if (newUser == null) {
+            JsonResponse.error(resp, 400, "Invalid JSON body");
+            return;
         }
+
+        boolean ok = userDAO.createUser(newUser);
+
+        if (ok) JsonResponse.success(resp, "User created");
+        else JsonResponse.error(resp, 500, "Failed to create user");
     }
 
+    // -- PUT (Update User) --
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        HttpSession session = req.getSession(false);
+
+        if (session == null) {
+            JsonResponse.error(resp, 401, "Not authenticated");
+            return;
+        }
+
+        int requesterId = (int) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
+        String path = req.getPathInfo();
+
+        User data = JsonResponse.readBody(req, User.class);
+
+        if (data == null) {
+            JsonResponse.error(resp, 400, "Invalid body");
+            return;
+        }
+
+        // /api/users/me
+        if ("/me".equals(path)) {
+            boolean ok = userDAO.updateUser(requesterId, data);
+            if (ok) JsonResponse.success(resp, "Profile updated");
+            else JsonResponse.error(resp, 500, "Failed to update profile");
+            return;
+        }
+
+        // Admin update /api/users/:id
+        if (!"admin".equals(role)) {
+            JsonResponse.error(resp, 403, "Forbidden: admin only");
+            return;
+        }
+
+        Integer targetId = PathUtil.getIdFromUrl(req);
+        boolean ok = userDAO.updateUser(targetId, data);
+
+        if (ok) JsonResponse.success(resp, "User updated");
+        else JsonResponse.error(resp, 500, "Failed to update user");
+    }
+
+    // -- DELETE (Remove User) --
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        HttpSession session = req.getSession(false);
+
+        if (session == null || !"admin".equals(session.getAttribute("role"))) {
+            JsonResponse.error(resp, 403, "Admin only");
+            return;
+        }
+
+        Integer id = PathUtil.getIdFromUrl(req);
+        boolean ok = userDAO.delete(id);
+
+        if (ok) JsonResponse.success(resp, "User deleted");
+        else JsonResponse.error(resp, 500, "Failed to delete user");
+    }
 }
