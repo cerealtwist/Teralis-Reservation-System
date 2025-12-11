@@ -1,101 +1,55 @@
 package com.teralis.model;
 
-// Interface
-interface IReservasi {
-    void konfirmasi();
-    void batal();
-}
+import java.sql.Time;
+import java.sql.Date;
 
-public class Reservation implements IReservasi {
+public class Reservation {
 
-    // Atribut
-    private int idReservasi;
-    private String tanggal;
-    private String waktuMulai;
-    private String waktuSelesai;
-    private String status;
-    private int idUser;
-    private int idRoom;
+    private int id;
+    private int userId;
+    private int roomId;
+    private Date date;
+    private Time startTime;
+    private Time endTime;
+    private String status;    // pending, approved, rejected
+    private String reason;
 
-    // Constructor
     public Reservation() {}
 
-    public Reservation(int idReservasi, String tanggal, String waktuMulai,
-                       String waktuSelesai, String status, int idUser, int idRoom) {
-        this.idReservasi = idReservasi;
-        this.tanggal = tanggal;
-        this.waktuMulai = waktuMulai;
-        this.waktuSelesai = waktuSelesai;
+    public Reservation(int id, int userId, int roomId, Date date,
+                       Time startTime, Time endTime, String status, String reason) {
+        this.id = id;
+        this.userId = userId;
+        this.roomId = roomId;
+        this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.status = status;
-        this.idUser = idUser;
-        this.idRoom = idRoom;
-    }
-  
-    // Getter & Setter
-    public int getIdReservasi() { 
-        return idReservasi; 
+        this.reason = reason;
     }
 
-    public void setIdReservasi(int idReservasi) { 
-        this.idReservasi = idReservasi; 
-    }
+    // Getters & Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public String getTanggal() { 
-        return tanggal; 
-    }
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 
-    public void setTanggal(String tanggal) { 
-        this.tanggal = tanggal; 
-    }
+    public int getRoomId() { return roomId; }
+    public void setRoomId(int roomId) { this.roomId = roomId; }
 
-    public String getWaktuMulai() { 
-        return waktuMulai; 
-    }
+    public Date getDate() { return date; }
+    public void setDate(Date date) { this.date = date; }
 
-    public void setWaktuMulai(String waktuMulai) { 
-        this.waktuMulai = waktuMulai; 
-    }
+    public Time getStartTime() { return startTime; }
+    public void setStartTime(Time startTime) { this.startTime = startTime; }
 
-    public String getWaktuSelesai() { 
-        return waktuSelesai; 
-    }
+    public Time getEndTime() { return endTime; }
+    public void setEndTime(Time endTime) { this.endTime = endTime; }
 
-    public void setWaktuSelesai(String waktuSelesai) { 
-        this.waktuSelesai = waktuSelesai; 
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public String getStatus() { 
-        return status; 
-    }
-
-    public void setStatus(String status) { 
-        this.status = status; 
-    }
-
-    public int getIdUser() { 
-        return idUser; 
-    }
-
-    public void setIdUser(int idUser) { 
-        this.idUser = idUser; 
-    }
-
-    public int getIdRoom() { 
-        return idRoom; 
-    }
-
-    public void setIdRoom(int idRoom) { 
-        this.idRoom = idRoom; 
-    }
-
-    // Implementasi Interface
-    @Override
-    public void konfirmasi() {
-        this.status = "Dikonfirmasi";
-    }
-
-    @Override
-    public void batal() {
-        this.status = "Dibatalkan";
-    }
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
 }
