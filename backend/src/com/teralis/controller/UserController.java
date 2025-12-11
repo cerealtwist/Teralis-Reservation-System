@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-@WebServlet("api/users/*")
+@WebServlet("/api/users/*")
 public class UserController extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
