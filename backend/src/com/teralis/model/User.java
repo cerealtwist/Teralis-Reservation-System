@@ -17,6 +17,9 @@ public abstract class User {
         this.role = role;
     }
 
+    // Abstract Method
+    public abstract boolean canApproveReservation();
+    
     // Getters & Setters
     public int getId(){
         return id;
