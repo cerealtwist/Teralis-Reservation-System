@@ -1,9 +1,34 @@
 package com.teralis.dao;
 
-import com.teralis.model.*;
+import com.teralis.model.Student;
+import com.teralis.model.User;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
+
+    // --GET All User (For Admin)--
+    public List<User> getAll() {
+        String sql = "SELECT * FROM users";
+        List<User> list = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapToUser(rs));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // --Find By Email--
     public User findByEmail(String email){
         String sql = "SELECT * FROM users WHERE email = ?";
 
@@ -52,6 +77,44 @@ public class UserDAO {
                 return statement.executeUpdate() > 0;
 
         } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+     // --- UPDATE USER (Admin or self-update) ---
+    public boolean updateUser(int id, User u) {
+        String sql = "UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+
+            st.setString(1, u.getName());
+            st.setString(2, u.getEmail());
+            st.setString(3, u.getRole());
+            st.setInt(4, id);
+
+            return st.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // --- DELETE USER ---
+    public boolean delete(int id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+
+            st.setInt(1, id);
+            return st.executeUpdate() > 0;
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
