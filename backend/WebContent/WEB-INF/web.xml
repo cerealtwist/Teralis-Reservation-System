@@ -18,40 +18,6 @@
     </filter-mapping>
 
     <!-- Controllers -->
-    <servlet>
-        <servlet-name>AuthController</servlet-name>
-        <servlet-class>com.teralis.controller.AuthController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AuthController</servlet-name>
-        <url-pattern>/api/auth/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>RoomController</servlet-name>
-        <servlet-class>com.teralis.controller.RoomController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>RoomController</servlet-name>
-        <url-pattern>/api/rooms/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>ReservationController</servlet-name>
-        <servlet-class>com.teralis.controller.ReservationController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ReservationController</servlet-name>
-        <url-pattern>/api/reservations/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>BuildingController</servlet-name>
-        <servlet-class>com.teralis.controller.BuildingController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>BuildingController</servlet-name>
-        <url-pattern>/api/buildings/*</url-pattern>
-    </servlet-mapping>
+    
 
 </web-app>
