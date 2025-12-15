@@ -13,6 +13,18 @@ public class AuthFilter implements Filter{
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
 
+        // -- CORS HEADER --
+        resp.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+
+        // Handle preflight request
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod())){
+            resp.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         // allow to login to endpoint without session
         String path = req.getRequestURI();
 
