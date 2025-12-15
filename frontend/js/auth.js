@@ -38,8 +38,8 @@ function redirectByRole(role) {
   if (role === "admin") {
     window.location.href = "admin.html";
   } else if (role === "student") {
-    // blm buat file
+    window.location.href = "student.html";
   } else if (role === "lecturer") {
-    // blm buat file
+    window.location.href = "lecturer.html";
   }
 }
