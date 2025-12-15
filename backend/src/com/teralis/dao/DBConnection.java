@@ -7,7 +7,7 @@ public class DBConnection {
     private static Connection conn;
     private static final String URL = "jdbc:mysql://localhost:3306/teralis?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
-    private static final String PASS = "pboK8";
+    private static final String PASS = "oplibroot123";
 
     public static Connection getConnection() throws SQLException {
         try {

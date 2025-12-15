@@ -1,5 +1,7 @@
 package com.teralis.dao;
 
+import com.teralis.model.Admin;
+import com.teralis.model.Lecturer;
 import com.teralis.model.Student;
 import com.teralis.model.User;
 import java.sql.*;
@@ -130,10 +132,10 @@ public class UserDAO {
                 u = new Student();
                 break;
             case "lecturer":
-                //u = new Lecturer(); <- NOT IMPLEMENTED
+                u = new Lecturer();
                 break;
             case "admin":
-                //u = new Admin(); <- NOT IMPLEMENTED
+                u = new Admin();
                 break;
             default:
                 throw new IllegalStateException("Unknown user role: " + role);
