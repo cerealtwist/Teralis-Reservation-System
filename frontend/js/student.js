@@ -24,4 +24,22 @@ function logout() {
   }).then(() => window.location.href = "login.html");
 }
 
+function rooms(){
+  const payload = {
+    roomId: roomId,
+    date: document.getElementById("date").value,
+    startTime: "09.00",
+    endTime: "11.00"
+  };
+
+  fetch("http://localhost:8080/WebContent/api/reservations", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => alert(data.message));
+}
+
 loadRooms();

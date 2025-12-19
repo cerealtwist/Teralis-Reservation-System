@@ -8,6 +8,7 @@ import com.teralis.utils.PathUtil;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 
 @WebServlet("/api/reservations/*")
@@ -35,14 +36,43 @@ public class ReservationController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
-        Reservation r = JsonResponse.readBody(req, Reservation.class);
-
-        if (reservationDAO.create(r)) {
-            JsonResponse.success(resp, "Reservation created");
-        } else {
-            JsonResponse.error(resp, 500, "Failed to create reservation");
+        HttpSession session = req.getSession(false);
+        if (session == null || !"student".equals(session.getAttribute("role"))) {
+            JsonResponse.error(resp, 403, "Student only");
+            return;
         }
+
+        Reservation data = JsonResponse.readBody(req, Reservation.class);
+
+        if (data == null) {
+            JsonResponse.error(resp, 400, "Invalid request body");
+            return;
+        }
+
+        // Tanggal tidak boleh lewat
+        if (data.getDate().before(new Date(System.currentTimeMillis()))) {
+            JsonResponse.error(resp, 400, "Date must be today or later");
+            return;
+        }
+
+        // Cek reservasi bentrok
+        boolean available = reservationDAO.isTimeSlotAvailable(
+            data.getRoomId(),
+            data.getDate(),
+            data.getStartTime(),
+            data.getEndTime()
+        );
+
+        if (!available) {
+            JsonResponse.error(resp, 409, "Time slot already booked");
+            return;
+        }
+
+        data.setUserId((int) session.getAttribute("userId"));
+        data.setStatus("pending");
+
+        reservationDAO.create(data);
+        JsonResponse.success(resp, "Reservation created");
     }
 
     @Override
@@ -63,3 +93,4 @@ public class ReservationController extends HttpServlet {
         }
     }
 }
+
