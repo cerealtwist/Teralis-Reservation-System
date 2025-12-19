@@ -100,4 +100,34 @@ public class ReservationDAO {
 
         return r;
     }
+
+    public boolean isTimeSlotAvailable(int roomId, Date date, Time start, Time end) {
+    String sql = """
+        SELECT COUNT(*) FROM reservations
+        WHERE room_id = ?
+        AND date = ?
+        AND status = 'approved'
+        AND (
+            (start_time < ? AND end_time > ?)
+        )
+    """;
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement statement = conn.prepareStatement(sql)) {
+
+        statement.setInt(1, roomId);
+        statement.setDate(2, date);
+        statement.setTime(3, end);
+        statement.setTime(4, start);
+
+        ResultSet rs = statement.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) == 0;
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
 }
