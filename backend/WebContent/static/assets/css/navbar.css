@@ -34,6 +34,10 @@
   line-height: 1;
 }
 
+.nav-main {
+  gap: 16px;
+}
+
 .btn-login {
   background: linear-gradient(180deg, #AF212C 0%, #B2202B 100%);
   color: white;

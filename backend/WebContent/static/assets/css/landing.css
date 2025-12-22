@@ -20,16 +20,24 @@
   height: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-center .d-flex {
+  justify-content: center;
 }
 
 .hero h1 {
   font-family: 'DM Sans', sans-serif;
   font-size: 3rem;
   color: white;
+  letter-spacing: -0.5px;
 }
 
 .hero p {
   font-family: 'Roboto', sans-serif;
   color: var(--secondary-neutral);
   max-width: 720px;
+  margin: 0 auto;
 }
