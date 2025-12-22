@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@600;700&family=Roboto:wght@400;700&display=swap');
+
+:root {
+  --primary-red: #D22929;
+  --highlight-yellow: #FFC226;
+
+  --text-neutral: #717D96;
+  --secondary-neutral: #ADB5C7;
+  --card-bg: #F1F3F7;
+  --border-neutral: #E9E9E9;
+}
