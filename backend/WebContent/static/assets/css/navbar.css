@@ -9,16 +9,29 @@
   color: white;
 }
 
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
   color: var(--secondary-neutral);
-  margin: 0 12px;
 }
 
 .nav-link.active,
 .nav-link:hover {
   color: var(--primary-red);
+}
+
+.nav-link span {
+  line-height: 1;
 }
 
 .btn-login {
