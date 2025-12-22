@@ -1,3 +1,7 @@
+/* ==============================
+   NAVBAR - BASE
+   ============================== */
+
 .navbar-teralis {
   background: transparent;
   padding: 24px 0;
@@ -45,4 +49,32 @@
   border-radius: 15px;
   font-weight: 700;
   text-decoration: none;
+}
+
+
+/* ==============================
+   NAVBAR - AUTH VERSION
+   ============================== */
+
+.navbar-auth {
+  background: #ffffff;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-neutral);
+}
+
+/* Link default */
+.navbar-auth .nav-link {
+  color: var(--text-neutral);
+}
+
+/* Active & hover */
+.navbar-auth .nav-link.active,
+.navbar-auth .nav-link:hover {
+  color: var(--primary-red);
+}
+
+/* Button login (tetap konsisten) */
+.navbar-auth .btn-login {
+  background: linear-gradient(180deg, #AF212C 0%, #B2202B 100%);
+  color: #fff;
 }

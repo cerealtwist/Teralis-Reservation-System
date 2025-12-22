@@ -9,3 +9,9 @@
   --card-bg: #F1F3F7;
   --border-neutral: #E9E9E9;
 }
+
+body {
+  font-family: 'Roboto', sans-serif;
+  color: var(--text-neutral);
+}
+

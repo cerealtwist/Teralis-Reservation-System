@@ -1,0 +1,89 @@
+.login-wrapper {
+  height: 100vh;
+  padding-top: 90px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.login-title span {
+  color: var(--primary-red);
+}
+
+.login-desc {
+  font-family: 'Roboto', sans-serif;
+  color: var(--text-neutral);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+/* FORM */
+.form-label {
+  font-weight: 500;
+}
+
+.form-control {
+  height: 48px;
+  border-radius: 12px;
+}
+
+/* LINKS */
+.forgot-link {
+  font-size: 14px;
+  color: var(--primary-red);
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* ERROR */
+.error-message {
+  color: #D22929;
+  font-size: 14px;
+  min-height: 20px;
+  margin-bottom: 12px;
+}
+
+/* BUTTONS */
+.btn-login {
+  background: linear-gradient(180deg, #AF212C 0%, #B2202B 100%);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-weight: 700;
+}
+
+.btn-login:hover {
+  opacity: 0.95;
+}
+
+.btn-sso {
+  border: 1px solid var(--border-neutral);
+  border-radius: 14px;
+  padding: 12px;
+  background: #fff;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* IMAGE SIDE */
+.login-image {
+  background: url("../img/telu-login.png") center / cover no-repeat;
+}
