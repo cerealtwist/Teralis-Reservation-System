@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>room | Teralis</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/design-system.css">
+  <link rel="stylesheet" href="assets/css/navbar.css">
+  <link rel="stylesheet" href="assets/css/room.css">
+</head>
+
+<body>
+
+<!-- NAVBAR (AUTH VERSION / WHITE) -->
+<nav class="navbar navbar-expand-lg navbar-auth fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <img src="assets/icons/teralis-logo-red.svg" alt="Teralis">
+    </a>
+
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav nav-main me-4">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="room.html">Ruangan</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Petunjuk</a>
+        </li>
+      </ul>
+
+      <a href="login.html" class="btn-login">Login</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="room-hero">
+  <div class="room-overlay"></div>
+
+  <div class="container room-hero-content text-center">
+    <h1>Cek Ketersediaan Ruangan</h1>
+    <p>
+      Silahkan cek ketersediaan Ruangan untuk memastikan Ruangan yang anda
+      perlukan masih belum disewa pihak lain.
+    </p>
+
+    <!-- SEARCH CARD -->
+    <div class="search-card">
+      <select class="form-select">
+        <option selected disabled>Pilih Gedung</option>
+        <option>Gedung A</option>
+        <option>Gedung B</option>
+      </select>
+
+      <input type="date" class="form-control" disabled>
+      <select class="form-select" disabled>
+        <option>Waktu</option>
+      </select>
+
+      <button class="btn-search" disabled>Cari Ruangan</button>
+    </div>
+  </div>
+</section>
+
+<!-- RESULT PLACEHOLDER -->
+<section class="room-result text-center">
+  <p class="text-muted">Anda belum mencari Gedung</p>
+</section>
+
+<footer class="footer">
+  <small>Copyright © 2025 TERRAS – TEL-U Room Reservation System</small>
+</footer>
+
+</body>
+</html>

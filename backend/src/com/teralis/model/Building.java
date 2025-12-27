@@ -7,13 +7,25 @@ public class Building {
     private String location;
     private String description;
 
+    private String code;
+    private boolean isActive;
+
     public Building() {}
 
+    // Legacy Constructor
     public Building(int id, String name, String location, String description) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.description = description;
+    }
+
+    // Constructor New
+    public Building(int id, String name, String code, boolean isActive) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
+        this.isActive = isActive;
     }
 
     // Getters & Setters
@@ -32,6 +44,7 @@ public class Building {
         this.name = name;
     }
 
+    // Legacy
     public String getLocation() {
         return location;
     }
@@ -46,5 +59,22 @@ public class Building {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    // New
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

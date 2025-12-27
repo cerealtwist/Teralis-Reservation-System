@@ -9,14 +9,19 @@ public class BuildingDAO {
 
     public List<Building> getAllBuildings() {
         List<Building> list = new ArrayList<>();
-        String sql = "SELECT * FROM buildings ORDER BY name ASC";
+                String sql = """
+            SELECT id, name, code, is_active
+            FROM buildings
+            WHERE is_active = true
+            ORDER BY name ASC
+        """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql);
              ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
-                list.add(mapToBuilding(rs));
+                list.add(map(rs));
             }
 
         } catch (Exception e) {
@@ -27,14 +32,17 @@ public class BuildingDAO {
     }
 
     public boolean create(Building b) {
-        String sql = "INSERT INTO buildings(name, location, description) VALUES (?, ?, ?)";
+        String sql = """
+            INSERT INTO buildings (name, code, is_active)
+            VALUES (?, ?, ?)
+        """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
             statement.setString(1, b.getName());
-            statement.setString(2, b.getLocation());
-            statement.setString(3, b.getDescription());
+            statement.setString(2, b.getCode());
+            statement.setBoolean(3, b.isActive());
 
             return statement.executeUpdate() > 0;
 
@@ -45,12 +53,12 @@ public class BuildingDAO {
         return false;
     }
 
-    private Building mapToBuilding(ResultSet rs) throws SQLException {
-        return new Building(
-            rs.getInt("id"),
-            rs.getString("name"),
-            rs.getString("location"),
-            rs.getString("description")
-        );
+    private Building map(ResultSet rs) throws SQLException {
+        Building b = new Building();
+        b.setId(rs.getInt("id"));
+        b.setName(rs.getString("name"));
+        b.setCode(rs.getString("code"));
+        b.setActive(rs.getBoolean("is_active"));
+        return b;
     }
 }
