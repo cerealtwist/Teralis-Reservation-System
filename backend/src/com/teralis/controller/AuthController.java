@@ -16,8 +16,20 @@ public class AuthController extends HttpServlet {
 
     // FIX: make LoginRequest static to fix JSON parsing
     private static class LoginRequest{
-        String email;
-        String password;
+        public String email;
+        public String password;
+    }
+
+    private static class LoginResponse {
+        public String status;
+        public String message;
+        public String role;
+
+        public LoginResponse(String status, String message, String role) {
+            this.status = status;
+            this.message = message;
+            this.role = role;
+        }
     }
 
     @Override
@@ -35,7 +47,7 @@ public class AuthController extends HttpServlet {
 
         LoginRequest data = JsonResponse.readBody(req, LoginRequest.class);
 
-        if (data.email == null || data.password == null) {
+        if (data == null || data.email == null || data.password == null) {
             JsonResponse.error(resp, 400, "Email and password required");
             return;
         }
@@ -60,7 +72,7 @@ public class AuthController extends HttpServlet {
         session.setAttribute("role", user.getRole());
         session.setAttribute("email", user.getEmail());
 
-        JsonResponse.success(resp, "Login success.");
+        JsonResponse.send(resp, new LoginResponse("success", "Login success.", user.getRole()));
 
     }
 

@@ -6,6 +6,7 @@ import com.teralis.utils.JsonResponse;
 import com.teralis.utils.PathUtil;
 
 import javax.servlet.http.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
@@ -16,18 +17,18 @@ public class RoomController extends HttpServlet {
     private final RoomDAO roomDAO = new RoomDAO();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
-        String buildingId = req.getParameter("building_id");
-
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String buildingIdParam = req.getParameter("building_id");
         List<Room> rooms;
 
-        if (buildingId != null) {
-            rooms = roomDAO.getRoomsByBuilding(Integer.parseInt(buildingId));
+        if (buildingIdParam != null && !buildingIdParam.isEmpty()) {
+            int buildingId = Integer.parseInt(buildingIdParam);
+            // Panggil rooms by building
+            rooms = roomDAO.getRoomsByBuilding(buildingId); 
         } else {
             rooms = roomDAO.getAllRooms();
         }
-
+        
         JsonResponse.send(resp, rooms);
     }
 

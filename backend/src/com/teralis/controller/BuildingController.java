@@ -16,7 +16,7 @@ public class BuildingController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        List<Building> list = buildingDAO.getAllBuildings();
+        List<Building> list = buildingDAO.getActiveBuildings(); 
         JsonResponse.send(resp, list);
     }
 }

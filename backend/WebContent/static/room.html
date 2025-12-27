@@ -62,10 +62,8 @@
 
     <!-- SEARCH CARD -->
     <div class="search-card">
-      <select class="form-select">
-        <option selected disabled>Pilih Gedung</option>
-        <option>Gedung A</option>
-        <option>Gedung B</option>
+      <select class="form-select" id="buildingSelect">
+        <option value="">Pilih Gedung</option>
       </select>
 
       <input type="date" class="form-control" disabled>
@@ -79,8 +77,16 @@
 </section>
 
 <!-- RESULT PLACEHOLDER -->
-<section class="room-result text-center">
-  <p class="text-muted">Anda belum mencari Gedung</p>
+<section class="room-result">
+  <h2 id="result-title" class="text-center mb-4">
+    Anda belum mencari Gedung
+  </h2>
+
+  <div id="room-list" class="room-grid"></div>
 </section>
+
+<script src="assets/js/room.js"></script>
 </body>
 </html>
+
+

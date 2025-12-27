@@ -75,12 +75,13 @@
           </p>
 
           <!-- FORM -->
-          <form method="post" action="/teralis-reservation-system/login">
+          <form id="loginForm">
 
             <div class="mb-4">
               <label class="form-label">Email</label>
               <input
                 type="email"
+                id="email"
                 name="email"
                 class="form-control"
                 placeholder="Masukkan Email"
@@ -92,6 +93,7 @@
               <label class="form-label">Password</label>
               <input
                 type="password"
+                id="password"
                 name="password"
                 class="form-control"
                 placeholder="••••••••"
@@ -106,20 +108,15 @@
                   Ingat Saya
                 </label>
               </div>
-
               <a href="#" class="forgot-link">Lupa Password</a>
             </div>
 
-            <!-- ERROR INLINE -->
-            <p class="error-message">
-              ${error}
-            </p>
+            <p id="errorDisplay" class="error-message text-danger"></p>
 
             <button type="submit" class="btn-login w-100">
               Sign In
             </button>
 
-            <!-- SSO BUTTON (UI ONLY) -->
             <button type="button" class="btn-sso w-100 mt-3" disabled>
               <img src="assets/img/microsoft.svg" alt="">
               Sign in dengan Akun Microsoft
@@ -136,6 +133,42 @@
     </div>
   </div>
 </section>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Mencegah reload halaman
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorDisplay = document.getElementById('errorDisplay');
+    
+    errorDisplay.textContent = ""; // Reset pesan error
+
+    try {
+      // Mengirim request POST dengan format JSON sesuai ekspektasi AuthController
+      const response = await fetch('/WebContent/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email, password: password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Login Sukses, arahkan ke halaman student atau dashboard utama
+        window.location.href = result.role + ".html";
+      } else {
+        // Tampilkan pesan error dari backend (misal: "Invalid Credentials")
+        errorDisplay.textContent = result.message || "Login gagal, silakan coba lagi.";
+      }
+    } catch (error) {
+        console.error("Fetch error:", error);
+        errorDisplay.textContent = "Terjadi kesalahan pada server.";
+    }
+  });
+</script>
 
 </body>
 </html>

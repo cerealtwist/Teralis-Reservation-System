@@ -63,26 +63,18 @@ public class BuildingDAO {
     }
 
     public List<Building> getActiveBuildings() {
-    List<Building> list = new ArrayList<>();
-    String sql = "SELECT id, name, code FROM buildings WHERE is_active = true ORDER BY name";
-
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-
-        while (rs.next()) {
-            Building b = new Building();
-            b.setId(rs.getInt("id"));
-            b.setName(rs.getString("name"));
-            b.setCode(rs.getString("code"));
-            list.add(b);
+        List<Building> list = new ArrayList<>();
+        String sql = "SELECT * FROM buildings WHERE is_active = 1"; // Filter di SQL
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(map(rs)); // Menggunakan method map setter-based Anda
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-
-    return list;
-}
 
 }
