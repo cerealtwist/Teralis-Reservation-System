@@ -17,7 +17,17 @@ public class RoomController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        List<Room> rooms = roomDAO.getAllRooms();
+
+        String buildingId = req.getParameter("building_id");
+
+        List<Room> rooms;
+
+        if (buildingId != null) {
+            rooms = roomDAO.getRoomsByBuilding(Integer.parseInt(buildingId));
+        } else {
+            rooms = roomDAO.getAllRooms();
+        }
+
         JsonResponse.send(resp, rooms);
     }
 

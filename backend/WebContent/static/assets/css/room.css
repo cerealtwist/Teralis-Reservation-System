@@ -1,7 +1,7 @@
 /* HERO */
 .room-hero {
   position: relative;
-  height: 420px;
+  height: 640px;
   background: url("../img/ruangan-hero.png") center / cover no-repeat;
   display: flex;
   align-items: center;
@@ -10,7 +10,7 @@
 .room-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(10, 35, 48, 0.65);
+  background: rgba(10, 35, 48, 0.253);
 }
 
 .room-hero-content {

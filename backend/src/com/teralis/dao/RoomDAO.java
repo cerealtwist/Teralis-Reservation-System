@@ -122,4 +122,26 @@ public class RoomDAO {
 
         return r;
     }
+
+    public List<Room> getRoomsByBuilding(int buildingId) {
+        List<Room> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM rooms WHERE building_id = ? AND status = 'available'";
+
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, buildingId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapToRoom(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }
