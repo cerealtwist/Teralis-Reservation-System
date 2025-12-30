@@ -100,7 +100,40 @@
         </div>
 
         <div id="calendar-section" class="mb-5">
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <h3 class="fw-bold mb-0" id="current-month-year">April 2025</h3>
+            <button class="btn btn-light rounded-circle shadow-sm">
+                <img src="assets/icons/clock.svg" width="16" style="opacity: 0.5;">
+            </button>
+        </div>
+        
+        <div class="btn-group calendar-segment" role="group">
+            <input type="radio" class="btn-check" name="view" id="month">
+            <label class="btn btn-outline-secondary px-3" for="month">Month</label>
+            
+            <input type="radio" class="btn-check" name="view" id="week" checked>
+            <label class="btn btn-outline-secondary px-3" for="week">Week</label>
+            
+            <input type="radio" class="btn-check" name="view" id="day">
+            <label class="btn btn-outline-secondary px-3" for="day">Day</label>
+        </div>
+    </div>
+
+    <div class="calendar-wrapper border rounded-4 overflow-hidden shadow-sm bg-white">
+            <div class="calendar-grid" id="calendar-grid">
+                <div class="time-label border-end bg-light text-muted small py-2 text-center">WIB +7</div>
+                <div class="day-header border-end text-center p-2"><strong>27</strong><br><small>April, Minggu</small></div>
+                <div class="day-header border-end text-center p-2"><strong>28</strong><br><small>April, Senin</small></div>
+                <div class="day-header border-end text-center p-2"><strong>29</strong><br><small>April, Selasa</small></div>
+                <div class="day-header border-end text-center p-2"><strong>30</strong><br><small>April, Rabu</small></div>
+                <div class="day-header border-end text-center p-2"><strong>01</strong><br><small>Mei, Kamis</small></div>
+                <div class="day-header border-end text-center p-2"><strong>02</strong><br><small>Mei, Jumat</small></div>
+                <div class="day-header text-center p-2"><strong>03</strong><br><small>Mei, Sabtu</small></div>
+
+                </div>
+        </div>
+    </div>
 
     </main>
 
