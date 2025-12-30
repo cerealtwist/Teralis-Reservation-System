@@ -8,11 +8,12 @@ public class Room {
     private int capacity;
     private String facilities;
     private String status; // available, maintenance
+    private String imageUrl; // room pictures
 
     public Room() {}
 
     public Room(int id, int buildingId, String name, String type, int capacity,
-                String facilities, String status) {
+                String facilities, String status, String imageUrl) {
         this.id = id;
         this.buildingId = buildingId;
         this.name = name;
@@ -20,6 +21,7 @@ public class Room {
         this.capacity = capacity;
         this.facilities = facilities;
         this.status = status;
+        this.imageUrl = imageUrl;
     }
 
     // Getters & Setters
@@ -78,4 +80,13 @@ public class Room {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
+

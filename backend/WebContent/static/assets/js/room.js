@@ -8,11 +8,9 @@ async function loadBuildings() {
     const buildings = await res.json();
     const select = document.getElementById("buildingSelect");
     
-    // Reset dan tambah placeholder
     select.innerHTML = '<option value="">-- Pilih Gedung --</option>';
 
     buildings.forEach(b => {
-      // HAPUS filter 'if (b.active === false...)' di sini
       const opt = document.createElement("option");
       opt.value = b.id;
       opt.textContent = b.name;
@@ -24,52 +22,78 @@ async function loadBuildings() {
 }
 
 function roomCardTemplate(room, buildingName) {
+  // Logika Status Badge
+  const statusClass = room.status === 'available' ? 'status-available' : 'status-maintenance';
+  const statusText = room.status === 'available' ? 'Tersedia' : 'Perbaikan';
+  const isMaintenance = room.status === 'maintenance';
+  
+  // Jika room.imageUrl ada di database, gunakan itu. 
+  // Jika kosong, gunakan gambar default 'telu-building.png'
+  const imageSource = room.imageUrl ? `assets/img/${room.imageUrl}` : `assets/img/telu-building.png`;
+
   return `
     <div class="room-card">
-      <img src="assets/img/placeholder.jpg" alt="${room.name}">
-
-      <div class="room-content">
-        <h3>${buildingName} – ${room.name}</h3>
-        <p class="room-desc">
-          Ruangan tersedia untuk kegiatan akademik maupun non-akademik.
-        </p>
-        <span class="capacity">
-          Kapasitas: ${room.capacity} orang
-        </span>
+      <div class="room-img-container">
+        <img src="${imageSource}" alt="${room.name}">
+        <span class="room-badge ${statusClass}">${statusText}</span>
       </div>
+      
+      <div class="room-card-body">
+        <div class="room-card-header">
+            <span class="room-type">${room.type || 'General'}</span>
+            <h3 class="room-title">${buildingName} – ${room.name}</h3>
+        </div>
+        
+        <div class="room-meta">
+          <div class="meta-item">
+            <img src="assets/icons/ruangan.svg" alt="Capacity">
+            <span>${room.capacity} Orang</span>
+          </div>
+        </div>
 
-      <a href="reservation.html?room_id=${room.id}" class="arrow-btn">→</a>
+        <p class="room-facilities">
+          ${room.facilities || "Fasilitas standar tersedia untuk kegiatan akademik."}
+        </p>
+
+        <a href="reservation.html?room_id=${room.id}" 
+           class="btn-book ${isMaintenance ? 'disabled' : ''}" 
+           ${isMaintenance ? 'onclick="return false;"' : ''}>
+          ${isMaintenance ? 'Tidak Tersedia' : 'Pesan Sekarang'}
+        </a>
+      </div>
     </div>
   `;
 }
 
 async function loadRooms(buildingId, buildingName) {
-  // Panggil endpoint yang sudah mendukung filter building_id
-  const res = await fetch(`${API_BASE_URL}/rooms?building_id=${buildingId}`);
-  const rooms = await res.json();
+  try {
+    const res = await fetch(`${API_BASE_URL}/rooms?building_id=${buildingId}`);
+    const rooms = await res.json();
 
-  document.getElementById("result-title").textContent = `Daftar Ruangan: ${buildingName}`;
-  const container = document.getElementById("room-list");
-  container.innerHTML = "";
+    document.getElementById("result-title").textContent = `Daftar Ruangan: ${buildingName}`;
+    const container = document.getElementById("room-list");
+    container.innerHTML = "";
 
-  if (rooms.length === 0) {
-    container.innerHTML = "<p class='text-center w-full py-10'>Tidak ada ruangan tersedia di gedung ini.</p>";
-    return;
+    if (rooms.length === 0) {
+      container.innerHTML = `
+        <div class="text-center w-100 py-5">
+            <p class="text-muted">Tidak ada ruangan tersedia di gedung ini.</p>
+        </div>`;
+      return;
+    }
+
+    rooms.forEach(r => {
+      container.innerHTML += roomCardTemplate(r, buildingName);
+    });
+  } catch (err) {
+    console.error("Gagal memuat ruangan:", err);
   }
-
-  rooms.forEach(r => {
-    container.innerHTML += roomCardTemplate(r, buildingName);
-  });
 }
 
-document.getElementById("buildingSelect")
-  .addEventListener("change", e => {
-    const selected = e.target.options[e.target.selectedIndex];
-    if (!selected.value) return;
-
-    loadRooms(selected.value, selected.text);
-  });
+document.getElementById("buildingSelect").addEventListener("change", e => {
+  const selected = e.target.options[e.target.selectedIndex];
+  if (!selected.value) return;
+  loadRooms(selected.value, selected.text);
+});
 
 loadBuildings();
-
-

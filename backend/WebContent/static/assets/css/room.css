@@ -59,7 +59,15 @@
 
 /* RESULT */
 .room-result {
-  padding: 80px 0;
+    padding: 60px 0;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#result-title {
+    margin-bottom: 48px; /* Jarak lebih luas antara judul dan kartu */
+    font-weight: 700;
+    color: #111827;
 }
 
 /* FOOTER */
@@ -68,4 +76,143 @@
   text-align: center;
   padding: 16px;
   color: var(--text-neutral);
+}
+
+/* GRID SYSTEM */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 380px)); 
+    justify-content: center; 
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+#room-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 380px));
+    justify-content: center;
+    gap: 32px;
+}
+
+/* CARD CONTAINER */
+.room-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.room-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* IMAGE AREA */
+.room-img-container {
+    position: relative;
+    height: 200px;
+    width: 100%;
+}
+
+.room-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* STATUS BADGE */
+.room-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-available { background: #DCFCE7; color: #166534; }
+.status-maintenance { background: #FEE2E2; color: #991B1B; }
+
+/* CARD BODY */
+.room-card-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.room-card-header {
+    margin-bottom: 12px;
+}
+
+.room-type {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--primary-red);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.room-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 4px;
+    color: #111827;
+}
+
+.room-meta {
+    margin-bottom: 20px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #4B5563;
+}
+
+.meta-item img {
+    width: 18px;
+    opacity: 0.7;
+}
+
+.room-facilities {
+    font-size: 14px;
+    color: #6B7280;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* BUTTON */
+.btn-book {
+    margin-top: auto;
+    background: var(--primary-red);
+    color: white;
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: background 0.2s;
+}
+
+.btn-book:hover {
+    background: #A01216;
+    color: white;
+}
+
+.btn-book.disabled {
+    background: #D1D5DB;
+    cursor: not-allowed;
+    pointer-events: none;
 }

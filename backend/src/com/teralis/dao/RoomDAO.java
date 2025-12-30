@@ -47,7 +47,7 @@ public class RoomDAO {
     }
 
     public boolean createRoom(Room r) {
-        String sql = "INSERT INTO rooms (building_id, name, type, capacity, facilities, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO rooms (building_id, name, type, capacity, facilities, status, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -58,6 +58,7 @@ public class RoomDAO {
             statement.setInt(4, r.getCapacity());
             statement.setString(5, r.getFacilities());
             statement.setString(6, r.getStatus());
+            statement.setString(7, r.getImageUrl());
 
             return statement.executeUpdate() > 0;
 
@@ -119,6 +120,7 @@ public class RoomDAO {
         r.setCapacity(rs.getInt("capacity"));
         r.setFacilities(rs.getString("facilities"));
         r.setStatus(rs.getString("status"));
+        r.setImageUrl(rs.getString("image_url"));
 
         return r;
     }
