@@ -28,21 +28,27 @@ public class RoomDAO {
     }
 
     public Room getRoomById(int id) {
-        String sql = "SELECT * FROM rooms WHERE id = ?";
+        // USE JOIN (AMBIL NAMA GEDUNG)
+        String sql = "SELECT r.*, b.name AS building_name " +
+                    "FROM rooms r " +
+                    "JOIN buildings b ON r.building_id = b.id " +
+                    "WHERE r.id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
+            PreparedStatement statement = conn.prepareStatement(sql)) {
 
             statement.setInt(1, id);
-
             ResultSet rs = statement.executeQuery();
 
-            if (rs.next()) return mapToRoom(rs);
-
+            if (rs.next()) {
+                Room r = mapToRoom(rs);
+                // SET NAMA GEDUNG DARI HASIL JOIN
+                r.setBuildingName(rs.getString("building_name"));
+                return r;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
     }
 

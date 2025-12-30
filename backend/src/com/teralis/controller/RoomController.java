@@ -17,20 +17,32 @@ public class RoomController extends HttpServlet {
     private final RoomDAO roomDAO = new RoomDAO();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    // Cek apakah ada ID di URL (with PathUtil)
+    int id = PathUtil.getIdFromUrl(req);
+
+    if (id != -1) {
+        // Jika ada ID, ambil detail satu ruangan
+        Room room = roomDAO.getRoomById(id);
+        if (room != null) {
+            JsonResponse.send(resp, room);
+        } else {
+            JsonResponse.error(resp, 404, "Ruangan tidak ditemukan");
+        }
+    } else {
+        // Jika !ID, ambil daftar ruangan (berdasarkan gedung atau semua)
         String buildingIdParam = req.getParameter("building_id");
         List<Room> rooms;
 
         if (buildingIdParam != null && !buildingIdParam.isEmpty()) {
             int buildingId = Integer.parseInt(buildingIdParam);
-            // Panggil rooms by building
             rooms = roomDAO.getRoomsByBuilding(buildingId); 
         } else {
             rooms = roomDAO.getAllRooms();
         }
-        
         JsonResponse.send(resp, rooms);
     }
+}
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {

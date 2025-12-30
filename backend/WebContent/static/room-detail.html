@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Ruangan | Teralis</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/design-system.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/room-detail.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-auth fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+                <img src="assets/icons/teralis-logo-red.svg" alt="Teralis Logo">
+            </a>
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav nav-main me-4">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="room.html">Ruangan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Petunjuk</a></li>
+                </ul>
+                <a href="login.html" id="login-nav-btn" class="btn-login">Login</a>
+                <a href="#" id="logout-nav-btn" class="btn-login" style="display: none;" onclick="handleLogout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-5 pt-5">
+        
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="room.html" id="breadcrumb-building-link">Gedung</a>
+                </li>
+                <li class="breadcrumb-item active" id="breadcrumb-room-active" aria-current="page">
+                    Nama Ruangan
+                </li>
+            </ol>
+        </nav>
+
+        <div class="row g-2 mb-4">
+            <div class="col-md-7">
+                <div class="img-main-wrapper shadow-sm">
+                    <img src="assets/img/telu-building.png" id="img-main" class="img-fluid rounded-4 h-100 w-100 object-fit-cover" alt="Main Photo">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="row g-2">
+                    <div class="col-6"><img src="assets/img/telu-building.png" class="img-fluid rounded-4 gallery-sub" alt="Sub 1"></div>
+                    <div class="col-6"><img src="assets/img/telu-building.png" class="img-fluid rounded-4 gallery-sub" alt="Sub 2"></div>
+                    <div class="col-6"><img src="assets/img/telu-building.png" class="img-fluid rounded-4 gallery-sub" alt="Sub 3"></div>
+                    <div class="col-6"><img src="assets/img/telu-building.png" class="img-fluid rounded-4 gallery-sub" alt="Sub 4"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h1 class="room-title-detail" id="room-name">Memuat Nama...</h1>
+                    <p class="room-subtitle">
+                        Gedung: <span id="room-building">...</span> &bull; 
+                        Kapasitas Ruangan: <span id="room-capacity" class="fw-bold">...</span>
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-cek">Cek</button>
+                    <a href="#" id="btn-reservasi" class="btn btn-reservasi-pill">Reservasi</a>
+                </div>
+            </div>
+            
+            <hr class="my-4 opacity-25">
+
+            <div class="row gy-3">
+                <div class="col-md-7 info-row">
+                    <div class="info-icon-bg">
+                        <img src="assets/icons/location.svg" width="18" alt="Loc">
+                    </div>
+                    <div>
+                        <small class="d-block text-muted">Lokasi</small>
+                        <span id="room-address" class="fw-medium"> Telkom University, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257</span>
+                    </div>
+                </div>
+                <div class="col-md-5 info-row">
+                    <div class="info-icon-bg">
+                        <img src="assets/icons/clock.svg" width="18" alt="Time">
+                    </div>
+                    <div>
+                        <small class="d-block text-muted">Waktu Operasional</small>
+                        <span class="fw-medium">Senin - Minggu &bull; 06:00 - 21:00 WIB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="calendar-section" class="mb-5">
+            </div>
+
+    </main>
+
+    <script src="assets/js/session.js"></script>
+    <script src="assets/js/room-detail.js"></script>
+</body>
+</html>

@@ -26,13 +26,16 @@ function roomCardTemplate(room, buildingName) {
   const statusClass = room.status === 'available' ? 'status-available' : 'status-maintenance';
   const statusText = room.status === 'available' ? 'Tersedia' : 'Perbaikan';
   const isMaintenance = room.status === 'maintenance';
-  
+
   // Jika room.imageUrl ada di database, gunakan itu. 
   // Jika kosong, gunakan gambar default 'telu-building.png'
   const imageSource = room.imageUrl ? `assets/img/${room.imageUrl}` : `assets/img/telu-building.png`;
 
+  // URL halaman detail dengan parameter ID
+  const detailUrl = `room-detail.html?id=${room.id}`;
+
   return `
-    <div class="room-card">
+    <div class="room-card" onclick="window.location.href='${detailUrl}'" style="cursor: pointer;">
       <div class="room-img-container">
         <img src="${imageSource}" alt="${room.name}">
         <span class="room-badge ${statusClass}">${statusText}</span>
@@ -55,11 +58,7 @@ function roomCardTemplate(room, buildingName) {
           ${room.facilities || "Fasilitas standar tersedia untuk kegiatan akademik."}
         </p>
 
-        <a href="reservation.html?room_id=${room.id}" 
-           class="btn-book ${isMaintenance ? 'disabled' : ''}" 
-           ${isMaintenance ? 'onclick="return false;"' : ''}>
-          ${isMaintenance ? 'Tidak Tersedia' : 'Pesan Sekarang'}
-        </a>
+        <a href="${detailUrl}" class="btn-book">Lihat Detail</a>
       </div>
     </div>
   `;
