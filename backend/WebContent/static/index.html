@@ -47,7 +47,8 @@
         </li>
       </ul>
 
-      <a href="login.html" class="btn-login">Login</a>
+      <a href="login.html" id="login-nav-btn" class="btn-login" style="display: none;">Login</a>
+      <a href="#" id="logout-nav-btn" class="btn-login" style="display: none;" onclick="handleLogout()">Logout</a>
     </div>
   </div>
 </nav>
@@ -64,12 +65,13 @@
       </p>
 
       <div class="d-flex gap-3">
-        <a href="login.html" class="btn-login">Reservasi</a>
+        <a href="login.html" id="hero-reservasi-btn" class="btn-login">Reservasi</a>
         <a href="#" class="btn btn-outline-light">Petunjuk</a>
       </div>
     </div>
   </div>
 </section>
+<script src="assets/js/session.js"></script>
 
 </body>
 </html>

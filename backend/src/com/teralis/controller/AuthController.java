@@ -80,14 +80,25 @@ public class AuthController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         String path = req.getPathInfo();
-
-        if ("/logout".equals(path)) {
+        if ("/status".equals(path)){
+            handleStatus(req, resp);
+        }else if ("/logout".equals(path)){
             HttpSession session = req.getSession(false);
             if (session != null) session.invalidate();
 
             JsonResponse.success(resp, "Logged out");
         } else {
             JsonResponse.error(resp, 404, " Unknown GET endpoint");
+        }
+    }
+
+    private void handleStatus(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session != null && session.getAttribute("userId") != null) {
+            String role = (String) session.getAttribute("role");
+            JsonResponse.send(resp, new LoginResponse("success", "Authenticated", role));
+        } else {
+            JsonResponse.error(resp, 401, "Not authenticated");
         }
     }
 
