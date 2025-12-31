@@ -29,3 +29,41 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("Gagal memuat detail ruangan.");
         });
 });
+
+function renderCalendarGrid() {
+    const grid = document.getElementById('calendar-grid');
+    const startTime = 7;  // 07:00
+    const endTime = 21;   // 21:00
+
+    for (let hour = startTime; hour <= endTime; hour++) {
+        const timeStr = hour.toString().padStart(2, '0') + ':00';
+        
+        // Label Waktu (Kolom 1)
+        const label = document.createElement('div');
+        label.className = 'time-slot-label';
+        label.textContent = timeStr;
+        grid.appendChild(label);
+
+        // Cell Kosong untuk 7 hari (Kolom 2 - 8)
+        for (let day = 0; day < 7; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell';
+            
+            // CONTOH: Menambahkan Reservasi Farand pada hari Minggu (day 0) jam 09:00
+            if (day === 0 && hour === 9) {
+                cell.innerHTML = `
+                    <div class="event-card-green shadow-sm" style="height: calc(300% - 8px);">
+                        <strong>Farand (3 jam)</strong>
+                        <small class="d-block opacity-75">Mahasiswa</small>
+                        <hr class="my-1 opacity-25">
+                        <p class="mb-0">Pelantikan Sistem Energi</p>
+                    </div>
+                `;
+            }
+            
+            grid.appendChild(cell);
+        }
+    }
+}
+
+renderCalendarGrid();
