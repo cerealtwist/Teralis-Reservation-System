@@ -1,0 +1,261 @@
+/* ================================
+   DESIGN TOKENS
+================================ */
+:root {
+    --telkom-red: #E1251B;
+    --telkom-red-hover: #b31d15;
+    --gray-light: #f8f9fa;
+    --gray-border: #dee2e6;
+    --text-dark: #212529;
+    --text-muted: #6c757d;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+.btn-lanjut {
+    background-color: var(--telkom-red) !important;
+    color: #fff !important;
+    border: none;
+    padding: 10px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-lanjut:hover {
+    background-color: var(--telkom-red-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(225, 37, 27, 0.2);
+}
+
+.btn-cancel {
+    background-color: #fff !important;
+    color: var(--telkom-red) !important;
+    border: 2px solid var(--telkom-red) !important;
+    padding: 8px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #fff5f5 !important;
+    color: var(--telkom-red-hover) !important;
+    border-color: var(--telkom-red-hover) !important;
+}
+
+/* ================================
+   FORM CONTROL
+================================ */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--telkom-red);
+    box-shadow: 0 0 0 0.25rem rgba(225, 37, 27, 0.1);
+}
+
+/* Time Picker */
+.time-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.time-input-group .form-control {
+    padding-left: 40px;
+    border-radius: 8px;
+}
+
+.time-input-group img {
+    position: absolute;
+    left: 14px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ================================
+   STEPPER
+================================ */
+.stepper-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 3rem;
+    padding: 0 12px;
+}
+
+/* Background line */
+.stepper-track {
+    position: absolute;
+    top: 22px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: var(--gray-border);
+    border-radius: 4px;
+    z-index: 1;
+}
+
+/* Progress line */
+.stepper-track-progress {
+    position: absolute;
+    top: 22px;
+    left: 0;
+    height: 4px;
+    width: 0%;
+    background-color: var(--telkom-red);
+    border-radius: 4px;
+    z-index: 2;
+    transition: width 0.4s ease;
+}
+
+/* Step items */
+.stepper-wrapper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 3;
+}
+
+.stepper-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Circle */
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 2px solid var(--gray-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #adb5bd;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+/* Label */
+.step-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Active & Completed */
+.stepper-item.active .step-circle,
+.stepper-item.completed .step-circle {
+    background-color: var(--telkom-red);
+    border-color: var(--telkom-red);
+    color: #fff;
+}
+
+.stepper-item.active .step-text {
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+/* ================================
+   STEP CONTENT
+================================ */
+.step-content {
+    display: none;
+}
+
+.step-content.active {
+    display: block;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   Upload Document Component
+   ========================= */
+
+.upload-dropzone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #fafbff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-dropzone:hover {
+    border-color: var(--telkom-red);
+    background: #fff5f5;
+}
+
+.upload-icon {
+    margin-bottom: 16px;
+}
+
+.upload-dropzone p {
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.upload-browse {
+    color: var(--telkom-red);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.upload-status {
+    margin-top: 24px;
+}
+
+.upload-file-item {
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+}
+
+.upload-file-item.uploading {
+    border-left: 4px solid var(--telkom-red);
+}
+
+.upload-file-item.success {
+    border-left: 4px solid #22c55e;
+}
+
+.upload-file-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.upload-file-remove {
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.upload-title {
+    text-align: center;
+}

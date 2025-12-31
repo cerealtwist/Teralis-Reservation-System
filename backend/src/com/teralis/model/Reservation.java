@@ -15,6 +15,7 @@ public class Reservation {
     private String reason;
     private String userName;
     private String userRole;
+    private String documentPath;
 
     public Reservation() {}
 
@@ -108,5 +109,8 @@ public class Reservation {
     public void setUserRole(String userRole){
         this.userRole = userRole;
     }
+
+    public String getDocumentPath() { return documentPath; }
+    public void setDocumentPath(String documentPath) { this.documentPath = documentPath; }
 
 }

@@ -69,7 +69,7 @@ public class BuildingDAO {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                list.add(map(rs)); // Menggunakan method map setter-based Anda
+                list.add(map(rs)); // Menggunakan method map setter-based
             }
         } catch (SQLException e) {
             e.printStackTrace();

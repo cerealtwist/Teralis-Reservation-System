@@ -5,13 +5,23 @@ import com.teralis.model.Reservation;
 import com.teralis.utils.JsonResponse;
 import com.teralis.utils.PathUtil;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Time;
+import java.util.Collection;
 import java.util.List;
 
 @WebServlet("/api/reservations/*")
+// TAMBAHKAN MULTIPART CONFIG UNTUK HANDLE UPLOAD FILE
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+    maxFileSize = 1024 * 1024 * 10,      // 10MB
+    maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
 public class ReservationController extends HttpServlet {
 
     private final ReservationDAO reservationDAO = new ReservationDAO();
@@ -46,44 +56,72 @@ public class ReservationController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
         if (session == null || !"student".equals(session.getAttribute("role"))) {
             JsonResponse.error(resp, 403, "Student only");
             return;
         }
 
-        Reservation data = JsonResponse.readBody(req, Reservation.class);
+        // KARENA MENGGUNAKAN MULTIPART (FormData) AMBIL PARAMETER SECARA MANUAL
+        // DONT USE JsonResponse.readBody untuk request multipart!
+        try {
+            Reservation data = new Reservation();
+            data.setRoomId(Integer.parseInt(req.getParameter("roomId")));
+            data.setDate(Date.valueOf(req.getParameter("date")));
+            data.setStartTime(Time.valueOf(req.getParameter("startTime")));
+            data.setEndTime(Time.valueOf(req.getParameter("endTime")));
+            data.setReason(req.getParameter("reason"));
 
-        if (data == null) {
-            JsonResponse.error(resp, 400, "Invalid request body");
-            return;
+            // Tanggal tidak boleh lewat
+            if (data.getDate().before(new Date(System.currentTimeMillis()))) {
+                JsonResponse.error(resp, 400, "Date must be today or later");
+                return;
+            }
+
+            // Cek reservasi bentrok
+            boolean available = reservationDAO.isTimeSlotAvailable(
+                data.getRoomId(),
+                data.getDate(),
+                data.getStartTime(),
+                data.getEndTime()
+            );
+
+            if (!available) {
+                JsonResponse.error(resp, 409, "Time slot already booked");
+                return;
+            }
+
+            // --- LOGIKA UPLOAD FILE ---
+            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdir();
+
+            Collection<Part> parts = req.getParts();
+            for (Part part : parts) {
+                // Pastikan mengambil part dari field "files"
+                if (part.getName().equals("files") && part.getSize() > 0) {
+                    String fileName = System.currentTimeMillis() + "_" + part.getSubmittedFileName();
+                    part.write(uploadPath + File.separator + fileName);
+                    
+                    // SET DOCUMENT PATH KE OBJEK RESERVATION
+                    // Jika user upload banyak file, gabungkan file (String joining)
+                    data.setDocumentPath(fileName); 
+                }
+            }
+            // --------------------------
+
+            data.setUserId((int) session.getAttribute("userId"));
+            data.setStatus("pending");
+
+            // Gunakan metode create DAO
+            reservationDAO.create(data);
+            JsonResponse.success(resp, "Reservation created");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JsonResponse.error(resp, 400, "Invalid data or file upload error: " + e.getMessage());
         }
-
-        // Tanggal tidak boleh lewat
-        if (data.getDate().before(new Date(System.currentTimeMillis()))) {
-            JsonResponse.error(resp, 400, "Date must be today or later");
-            return;
-        }
-
-        // Cek reservasi bentrok
-        boolean available = reservationDAO.isTimeSlotAvailable(
-            data.getRoomId(),
-            data.getDate(),
-            data.getStartTime(),
-            data.getEndTime()
-        );
-
-        if (!available) {
-            JsonResponse.error(resp, 409, "Time slot already booked");
-            return;
-        }
-
-        data.setUserId((int) session.getAttribute("userId"));
-        data.setStatus("pending");
-
-        reservationDAO.create(data);
-        JsonResponse.success(resp, "Reservation created");
     }
 
     @Override
@@ -95,6 +133,7 @@ public class ReservationController extends HttpServlet {
             String status;
         }
 
+        // Untuk doPut biasanya tetap menggunakan JSON (bukan FormData)
         UpdateStatus data = JsonResponse.readBody(req, UpdateStatus.class);
 
         if (reservationDAO.updateStatus(id, data.status)) {
@@ -104,4 +143,3 @@ public class ReservationController extends HttpServlet {
         }
     }
 }
-

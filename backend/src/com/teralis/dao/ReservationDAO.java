@@ -8,7 +8,7 @@ import java.util.List;
 public class ReservationDAO {
 
     public boolean create(Reservation r) {
-        String sql = "INSERT INTO reservations (user_id, room_id, date, start_time, end_time, reason) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations (user_id, room_id, date, start_time, end_time, reason, document_path) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -19,6 +19,7 @@ public class ReservationDAO {
             statement.setTime(4, r.getStartTime());
             statement.setTime(5, r.getEndTime());
             statement.setString(6, r.getReason());
+             statement.setString(7, r.getDocumentPath());
 
             return statement.executeUpdate() > 0;
 

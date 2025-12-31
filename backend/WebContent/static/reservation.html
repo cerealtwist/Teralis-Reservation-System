@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservasi Ruangan | Teralis</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/design-system.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/reservation.css"> 
+</head>
+
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-auth fixed-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="assets/icons/teralis-logo-red.svg" alt="Teralis">
+        </a>
+    </div>
+</nav>
+
+<main class="container mt-5 pt-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+
+            <!-- ================= STEPPER ================= -->
+            <div class="stepper-container">
+
+                <div class="stepper-track"></div>
+                <div class="stepper-track-progress" id="line-progress"></div>
+
+                <div class="stepper-wrapper">
+                    <div class="stepper-item active" id="step-1-label">
+                        <div class="step-circle">1</div>
+                        <div class="step-text">Room & Time</div>
+                    </div>
+
+                    <div class="stepper-item" id="step-2-label">
+                        <div class="step-circle">2</div>
+                        <div class="step-text">Borrower Info</div>
+                    </div>
+
+                    <div class="stepper-item" id="step-3-label">
+                        <div class="step-circle">3</div>
+                        <div class="step-text">Activity</div>
+                    </div>
+
+                    <div class="stepper-item" id="step-4-label">
+                        <div class="step-circle">4</div>
+                        <div class="step-text">Documents</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= FORM ================= -->
+            <form id="reservationForm" class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+
+                <!-- STEP 1 -->
+                <div class="step-content active" id="step-1">
+                    <h4 class="fw-bold mb-4">Pilih Ruangan & Waktu</h4>
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <label class="form-label fw-medium">Ruangan</label>
+                            <select class="form-select py-2" id="room_id" required>
+                                <option value="">Pilih Ruangan...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Tipe Penggunaan</label>
+                            <select class="form-select py-2">
+                                <option>Internal Kampus</option>
+                                <option>Eksternal / Umum</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Tanggal</label>
+                            <input type="date" class="form-control py-2" id="res_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">Mulai</label>
+                            <div class="time-input-group">
+                                <img src="assets/icons/clock.svg" width="16">
+                                <input type="time" class="form-control py-2" id="start_time" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">Selesai</label>
+                            <div class="time-input-group">
+                                <img src="assets/icons/clock.svg" width="16">
+                                <input type="time" class="form-control py-2" id="end_time" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="step-content" id="step-2">
+                    <h4 class="fw-bold mb-4">Informasi Peminjam</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="user_name" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">NIM / NIP</label>
+                            <input type="text" class="form-control" id="user_id_display" readonly>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-medium">Program Studi / Unit</label>
+                            <input type="text" class="form-control" placeholder="Contoh: S1 Sains Data">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Email Aktif</label>
+                            <input type="email" class="form-control" placeholder="nama@student.telkomuniversity.ac.id">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Nomor Telepon / WA</label>
+                            <input type="tel" class="form-control" placeholder="0812xxxx">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div class="step-content" id="step-3">
+                    <h4 class="fw-bold mb-4">Detail Kegiatan</h4>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Nama Kegiatan</label>
+                            <input type="text" class="form-control" id="purpose" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Tipe Kegiatan</label>
+                            <select class="form-select">
+                                <option>Seminar</option>
+                                <option>Rapat</option>
+                                <option>Lomba</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Estimasi Peserta</label>
+                            <input type="number" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Deskripsi Kegiatan</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4 (CUSTOM UPLOAD) -->
+                <div class="step-content" id="step-4">
+                    <h4 class="fw-bold mb-4 text-center">Upload Dokumen Peminjaman</h4>
+
+                    <div class="upload-dropzone" id="dropzone">
+                        <div class="upload-icon">
+                            <img src="assets/icons/cloud-upload.svg" width="56">
+                        </div>
+                        <p class="mb-1">
+                            Drag & drop files or
+                            <span class="upload-browse" onclick="document.getElementById('fileInput').click()">Browse</span>
+                        </p>
+                        <small class="text-muted">
+                            Format: JPEG, PNG, PDF, DOCX (Maks 2 MB)
+                        </small>
+
+                        <input type="file" id="fileInput" hidden multiple>
+                    </div>
+
+                    <div class="upload-status mt-4">
+                        <p class="text-muted text-center mb-3" id="uploadCounter">
+                            Uploading - 0/3 files
+                        </p>
+
+                        <div id="fileList"></div>
+                    </div>
+
+                    <button type="button" class="btn btn-lanjut w-100 mt-4">
+                        UPLOAD FILES
+                    </button>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                    <a href="room-detail.html" class="btn btn-cancel">Cancel</a>
+                    <div class="d-flex gap-3">
+                        <button type="button" class="btn btn-outline-secondary d-none" id="btnPrev">Kembali</button>
+                        <button type="button" class="btn btn-lanjut" id="btnNext">Lanjut</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</main>
+
+<script src="assets/js/session.js"></script>
+<script src="assets/js/reservation-form.js"></script>
+</body>
+</html>
