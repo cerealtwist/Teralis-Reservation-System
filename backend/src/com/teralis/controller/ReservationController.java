@@ -114,10 +114,6 @@ public class ReservationController extends HttpServlet {
             data.setUserId((int) session.getAttribute("userId"));
             data.setStatus("pending");
 
-            // Gunakan metode create DAO
-            reservationDAO.create(data);
-            JsonResponse.success(resp, "Reservation created");
-
             // SIMPAN HASIL KE DALAM VARIABEL BOOLEAN
             boolean isCreated = reservationDAO.create(data);
 

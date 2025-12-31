@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // 2. Auto-fill Data Peminjam dari Session/LocalStorage
     // Analogi: Seperti fitur 'Auto-complete' agar user tidak mengetik NIM yang sama berulang kali.
     document.getElementById('user_name').value = localStorage.getItem('userName') || 'Mahasiswa 1';
-    document.getElementById('user_id_display').value = localStorage.getItem('userId') || '120121xxxx';
+    document.getElementById('user_id_display').value = localStorage.getItem('userId') || 'NIM';
 
     // 3. Inisialisasi Logika Dropzone
     initUploadLogic();
