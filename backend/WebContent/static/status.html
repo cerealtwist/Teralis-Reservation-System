@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Status Reservasi | Teralis</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/design-system.css">
+    <link rel="stylesheet" href="assets/css/status.css">
+</head>
+
+<body class="bg-light">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-auth fixed-top shadow-sm bg-white">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="assets/icons/teralis-logo-red.svg" alt="Teralis" height="28">
+        </a>
+
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav gap-3 align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="room.html">Ruangan</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="status.html">Status</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ================= MAIN ================= -->
+<main class="container mt-5 pt-5">
+    <div class="row g-4 mb-5">
+
+        <!-- ===== LEFT SIDEBAR ===== -->
+        <div class="col-md-4">
+            <div class="pe-md-3">
+
+                <h5 class="fw-bold mb-4">Reservasi Mendatang</h5>
+                <div id="upcoming-list" class="d-flex flex-column gap-3 mb-5">
+                    <!-- Injected by JS -->
+                </div>
+
+                <h5 class="fw-bold mb-4">Riwayat Reservasi</h5>
+                <div id="history-list" class="d-flex flex-column gap-3">
+                    <!-- Injected by JS -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== RIGHT DETAIL PANEL ===== -->
+        <div class="col-md-8">
+
+            <!-- Detail Card -->
+            <div id="detail-card"
+                 class="bg-white rounded-4 shadow-sm p-5 border"
+                 style="display: none; min-height: 500px;">
+                <!-- Injected by JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state"
+                 class="d-flex flex-column align-items-center justify-content-center
+                        bg-white rounded-4 border shadow-sm"
+                 style="min-height: 500px;">
+                <img src="assets/icons/calendar.svg" width="60" class="mb-3">
+                <p class="text-muted fw-medium">
+                    Pilih reservasi di samping untuk melihat detail
+                </p>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- ================= SCRIPT ================= -->
+<script src="assets/js/session.js"></script>
+<script src="assets/js/status.js"></script>
+
+</body>
+</html>

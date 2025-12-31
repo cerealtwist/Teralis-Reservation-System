@@ -1,0 +1,137 @@
+/* ==============================
+   STATUS PAGE – FINAL CSS
+   ============================== */
+
+/* Navbar */
+.navbar-auth .nav-link {
+    color: #555;
+    font-weight: 500;
+}
+
+.navbar-auth .nav-link.active {
+    color: var(--telkom-red);
+}
+
+/* ==============================
+   Sidebar Reservation List
+   ============================== */
+
+.reservation-item {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    transition: all 0.25s ease;
+    border-left: 4px solid transparent;
+}
+
+.reservation-item:hover {
+    background: #f8f9fa;
+}
+
+.reservation-item.active {
+    border-left: 4px solid #ff9800;
+    background: #fff7e6;
+}
+
+.reservation-item .thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* ==============================
+   Detail Panel (Right Side)
+   ============================== */
+
+#detail-card h2 {
+    font-size: 1.6rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.status-badge.pending {
+    background: #ffb800;
+    color: #fff;
+}
+
+.status-badge.approved {
+    background: #22c55e;
+    color: #fff;
+}
+
+.status-badge.rejected {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* ==============================
+   Action Buttons (Reschedule / Cancel)
+   ============================== */
+
+.icon-action {
+    width: 90px;
+    padding: 14px 10px;
+    border-radius: 14px;
+    background: #f4f5f7;
+    border: none;
+    font-size: 0.75rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.icon-action img {
+    width: 20px;
+    margin-bottom: 6px;
+}
+
+.icon-action:hover {
+    background: #eaecef;
+}
+
+.icon-action.danger {
+    color: #d32f2f;
+}
+
+.icon-action.danger:hover {
+    background: #fff1f1;
+}
+
+/* ==============================
+   Activity Information Card
+   ============================== */
+
+.activity-card {
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 1.5rem;
+}
+
+.activity-card h6 {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+/* ==============================
+   Empty State
+   ============================== */
+
+#empty-state img {
+    opacity: 0.35;
+}
+
+#empty-state p {
+    font-size: 0.95rem;
+}

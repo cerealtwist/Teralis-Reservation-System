@@ -8,7 +8,7 @@ import java.util.List;
 public class ReservationDAO {
 
     public boolean create(Reservation r) {
-        String sql = "INSERT INTO reservations (user_id, room_id, date, start_time, end_time, reason, document_path) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations (user_id, room_id, date, start_time, end_time, reason, document_path, stauts) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -19,7 +19,8 @@ public class ReservationDAO {
             statement.setTime(4, r.getStartTime());
             statement.setTime(5, r.getEndTime());
             statement.setString(6, r.getReason());
-             statement.setString(7, r.getDocumentPath());
+            statement.setString(7, r.getDocumentPath());
+            statement.setString(8, r.getStatus());
 
             return statement.executeUpdate() > 0;
 
@@ -32,23 +33,26 @@ public class ReservationDAO {
 
     public List<Reservation> getByUser(int userId) {
         List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservations WHERE user_id = ? ORDER BY date DESC";
+        String sql = """
+                SELECT r.*, rm.name as room_name, b.name as building_name, rm.image_url 
+                FROM reservations r
+                JOIN rooms rm ON r.room_id = rm.id
+                JOIN buildings b ON rm.building_id = b.id
+                WHERE r.user_id = ? ORDER BY r.date DESC
+        """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
-
+            PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, userId);
-
             ResultSet rs = statement.executeQuery();
-
             while (rs.next()) {
-                list.add(map(rs));
+                Reservation r = map(rs);
+                r.setRoomName(rs.getString("room_name"));
+                r.setBuildingName(rs.getString("building_name"));
+                r.setRoomImage(rs.getString("image_url"));
+                list.add(r);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
 
@@ -116,6 +120,23 @@ public class ReservationDAO {
         return false;
     }
 
+        public boolean deleteIfOwnedByUser(int reservationId, int userId) {
+        // Kita gunakan status 'cancelled' daripada menghapus permanen agar ada riwayat (Audit Trail)
+        String sql = "UPDATE reservations SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status = 'pending'";
+        
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement statement = conn.prepareStatement(sql)) {
+            
+            statement.setInt(1, reservationId);
+            statement.setInt(2, userId);
+            
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private Reservation map(ResultSet rs) throws SQLException {
         Reservation r = new Reservation();
 
@@ -127,6 +148,7 @@ public class ReservationDAO {
         r.setEndTime(rs.getTime("end_time"));
         r.setStatus(rs.getString("status"));
         r.setReason(rs.getString("reason"));
+        r.setDocumentPath(rs.getString("document_path"));
 
         return r;
     }
@@ -159,5 +181,6 @@ public class ReservationDAO {
     }
     return false;
 }
+
 
 }

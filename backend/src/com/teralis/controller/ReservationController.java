@@ -118,6 +118,16 @@ public class ReservationController extends HttpServlet {
             reservationDAO.create(data);
             JsonResponse.success(resp, "Reservation created");
 
+            // SIMPAN HASIL KE DALAM VARIABEL BOOLEAN
+            boolean isCreated = reservationDAO.create(data);
+
+            if (isCreated) {
+                JsonResponse.success(resp, "Reservation created");
+            } else {
+                // Jika gagal di DB, beritahu frontend agar tidak bingung
+                JsonResponse.error(resp, 500, "Database error: Gagal menyimpan reservasi.");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             JsonResponse.error(resp, 400, "Invalid data or file upload error: " + e.getMessage());
@@ -140,6 +150,33 @@ public class ReservationController extends HttpServlet {
             JsonResponse.success(resp, "Status updated");
         } else {
             JsonResponse.error(resp, 500, "Failed to update status");
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // 1. Cek Sesi: Hanya mahasiswa yang bersangkutan yang boleh membatalkan
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            JsonResponse.error(resp, 401, "Unauthorized");
+            return;
+        }
+
+        try {
+            // Ambil ID dari URL (misal: /api/reservations/12)
+            int reservationId = PathUtil.getIdFromUrl(req);
+            int userId = (int) session.getAttribute("userId");
+
+            
+            boolean success = reservationDAO.deleteIfOwnedByUser(reservationId, userId);
+
+            if (success) {
+                JsonResponse.success(resp, "Reservation cancelled successfully");
+            } else {
+                JsonResponse.error(resp, 403, "Gagal membatalkan. Reservasi tidak ditemukan atau sudah diproses.");
+            }
+        } catch (Exception e) {
+            JsonResponse.error(resp, 400, "Invalid ID");
         }
     }
 }

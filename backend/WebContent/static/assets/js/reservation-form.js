@@ -155,7 +155,7 @@ function submitReservation() {
     .then(res => res.json())
     .then(result => {
         alert("Reservasi Berhasil Diajukan!");
-        window.location.href = "student.html";
+        window.location.href = "status.html";
     })
     .catch(err => {
         console.error(err);

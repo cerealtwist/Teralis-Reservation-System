@@ -16,11 +16,14 @@ public class Reservation {
     private String userName;
     private String userRole;
     private String documentPath;
+    private String roomName;
+    private String buildingName;
+    private String roomImage;
 
     public Reservation() {}
 
     public Reservation(int id, int userId, int roomId, Date date,
-                       Time startTime, Time endTime, String status, String reason) {
+                       Time startTime, Time endTime, String status, String reason, String documentPath) {
         this.id = id;
         this.userId = userId;
         this.roomId = roomId;
@@ -29,6 +32,7 @@ public class Reservation {
         this.endTime = endTime;
         this.status = status;
         this.reason = reason;
+        this.documentPath = documentPath;
     }
 
     // Getters & Setters
@@ -110,7 +114,19 @@ public class Reservation {
         this.userRole = userRole;
     }
 
-    public String getDocumentPath() { return documentPath; }
-    public void setDocumentPath(String documentPath) { this.documentPath = documentPath; }
+    public String getDocumentPath() {
+        return documentPath;
+    }
+
+    public void setDocumentPath(String documentPath) {
+        this.documentPath = documentPath;
+    }
+
+    public String getRoomName() { return roomName; }
+    public void setRoomName(String roomName) { this.roomName = roomName; }
+    public String getBuildingName() { return buildingName; }
+    public void setBuildingName(String buildingName) { this.buildingName = buildingName; }
+    public String getRoomImage() { return roomImage; }
+    public void setRoomImage(String roomImage) { this.roomImage = roomImage; }
 
 }
