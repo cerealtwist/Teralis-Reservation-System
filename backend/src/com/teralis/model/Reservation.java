@@ -13,6 +13,8 @@ public class Reservation {
     private Time endTime;
     private String status;    // pending, approved, rejected
     private String reason;
+    private String userName;
+    private String userRole;
 
     public Reservation() {}
 
@@ -90,4 +92,21 @@ public class Reservation {
     public void setReason(String reason) {
         this.reason = reason;
     }
+
+    public String getUserName(){
+        return userName;
+    }
+
+    public void setUserName(String userName){
+        this.userName = userName;
+    }
+
+    public String getUserRole(){
+        return userRole;
+    }
+
+    public void setUserRole(String userRole){
+        this.userRole = userRole;
+    }
+
 }

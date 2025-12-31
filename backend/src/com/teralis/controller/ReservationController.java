@@ -18,17 +18,28 @@ public class ReservationController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
-        HttpSession session = req.getSession(false);
-        int userId = (int) session.getAttribute("userId");
-        String role = (String) session.getAttribute("role");
-
+        String roomIdParam = req.getParameter("room_id");
         List<Reservation> list;
 
-        if (role.equals("admin")) {
-            list = reservationDAO.getAll();
+        // 1. if exist parameter room_id: Ambil jadwal untuk kalender
+        if (roomIdParam != null && !roomIdParam.isEmpty()) {
+            int roomId = Integer.parseInt(roomIdParam);
+            list = reservationDAO.getByRoom(roomId);
         } else {
-            list = reservationDAO.getByUser(userId);
+            // 2. else: Ambil berdasarkan session (untuk halaman profil/admin)
+            HttpSession session = req.getSession(false);
+            if (session == null) {
+                JsonResponse.error(resp, 401, "Unauthorized");
+                return;
+            }
+            int userId = (int) session.getAttribute("userId");
+            String role = (String) session.getAttribute("role");
+
+            if (role.equals("admin")) {
+                list = reservationDAO.getAll();
+            } else {
+                list = reservationDAO.getByUser(userId);
+            }
         }
 
         JsonResponse.send(resp, list);

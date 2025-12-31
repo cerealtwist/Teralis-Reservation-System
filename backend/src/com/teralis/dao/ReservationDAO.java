@@ -51,6 +51,35 @@ public class ReservationDAO {
         return list;
     }
 
+    public List<Reservation> getByRoom(int roomId) {
+    List<Reservation> list = new ArrayList<>();
+    // Query JOIN untuk mendapatkan data user sekaligus
+    String sql = """
+        SELECT r.*, u.name as user_name, u.role as user_role 
+        FROM reservations r
+        JOIN users u ON r.user_id = u.id
+        WHERE r.room_id = ? AND r.status = 'approved'
+        ORDER BY r.date, r.start_time
+    """;
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement statement = conn.prepareStatement(sql)) {
+
+        statement.setInt(1, roomId);
+        ResultSet rs = statement.executeQuery();
+
+        while (rs.next()) {
+            Reservation r = map(rs); // Menggunakan map yang sudah ada
+            r.setUserName(rs.getString("user_name"));
+            r.setUserRole(rs.getString("user_role"));
+            list.add(r);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
     public List<Reservation> getAll() {
         List<Reservation> list = new ArrayList<>();
         String sql = "SELECT * FROM reservations ORDER BY created_at DESC";
