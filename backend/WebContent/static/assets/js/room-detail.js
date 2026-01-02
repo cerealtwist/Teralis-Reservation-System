@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     initCalendarListeners(roomId);
 
-    fetch(`/WebContent/api/rooms/${roomId}`)
+    // Gunakan path relatif agar konsisten dengan halaman lain
+    fetch(`api/rooms/${roomId}`)
         .then(res => res.json())
         .then(room => {
             renderRoomInfo(room);
@@ -18,6 +19,15 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(err => console.error("Error Detail:", err));
 });
+
+// HELPER: Fungsi untuk format tanggal YYYY-MM-DD berdasarkan waktu lokal (bukan UTC)
+// Analogi: Jika .toISOString() adalah jam dunia (London), fungsi ini adalah jam dinding di rumah Anda.
+function formatDateLocal(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 
 function renderRoomInfo(room) {
     document.getElementById('room-name').textContent = room.name;
@@ -63,15 +73,15 @@ function renderCalendarBase() {
     const grid = document.getElementById('calendar-grid');
     grid.innerHTML = ""; 
     
-    // Konfigurasi Grid berdasarkan Mode
     const numDays = currentViewMode === 'day' ? 1 : 7;
     grid.style.gridTemplateColumns = `80px repeat(${numDays}, 1fr)`;
 
-    // Tentukan Tanggal Mulai Tampilan
     const startDate = new Date(currentViewDate);
     if (currentViewMode === 'week') {
-        // Set ke hari Minggu (0) minggu ini
-        startDate.setDate(currentViewDate.getDate() - currentViewDate.getDay());
+        // Set ke hari Senin (1) minggu ini (atau Minggu (0) sesuai preferensi)
+        const day = currentViewDate.getDay();
+        const diff = currentViewDate.getDate() - day + (day === 0 ? -6 : 1); 
+        startDate.setDate(diff);
     }
 
     // 1. Render Header WIB +7
@@ -80,7 +90,7 @@ function renderCalendarBase() {
     timeHeader.textContent = "WIB +7";
     grid.appendChild(timeHeader);
 
-    // 2. Render Header Hari (Dinamis)
+    // 2. Render Header Hari
     for (let i = 0; i < numDays; i++) {
         const headerDate = new Date(startDate);
         headerDate.setDate(startDate.getDate() + i);
@@ -107,11 +117,12 @@ function renderCalendarBase() {
         for (let i = 0; i < numDays; i++) {
             const cellDate = new Date(startDate);
             cellDate.setDate(startDate.getDate() + i);
-            const dateStr = cellDate.toISOString().split('T')[0]; // Hasil: YYYY-MM-DD
+            
+            // Use fungsi formatDateLocal agar tanggal 1 Januari tidak bergeser ke 31 Desember
+            const dateStr = formatDateLocal(cellDate);
 
             const cell = document.createElement('div');
             cell.className = 'calendar-cell';
-            // ID Unik menggunakan Tanggal agar event tidak tertukar antar minggu
             cell.id = `cell-${dateStr}-${hourStr}`;
             grid.appendChild(cell);
         }
@@ -120,7 +131,8 @@ function renderCalendarBase() {
 
 async function loadReservations(roomId) {
     try {
-        const res = await fetch(`/WebContent/api/reservations?room_id=${roomId}`);
+        // Gunakan path relatif agar aman dari masalah folder konteks server
+        const res = await fetch(`api/reservations?room_id=${roomId}`);
         const reservations = await res.json();
         renderReservationsOnGrid(reservations);
     } catch (err) {
@@ -130,22 +142,24 @@ async function loadReservations(roomId) {
 
 function renderReservationsOnGrid(reservations) {
     reservations.forEach(res => {
-        // res.startTime (SQL format: "09:00:00") -> ambil "09"
+        // Hanya tampilkan yang sudah disetujui (Approved)
+        if (res.status !== 'approved') return;
+
         const startHour = res.startTime.split(':')[0];
         const endHour = res.endTime.split(':')[0];
         const duration = parseInt(endHour) - parseInt(startHour);
 
-        // res.date (SQL format: "2025-12-31")
+        // ID target (Misal: cell-2026-01-01-09)
         const targetCellId = `cell-${res.date}-${startHour}`;
         const targetCell = document.getElementById(targetCellId);
         
         if (targetCell) {
             targetCell.innerHTML = `
                 <div class="event-card-green shadow-sm" style="height: calc(${duration * 100}% - 8px); z-index: 10;">
-                    <strong>${res.userName} (${duration} jam)</strong>
-                    <small class="d-block opacity-75">${res.userRole}</small>
+                    <strong>${res.userName || 'User'} (${duration} jam)</strong>
+                    <small class="d-block opacity-75">${res.userRole || ''}</small>
                     <hr class="my-1 opacity-25">
-                    <p class="mb-0 small">${res.reason || 'Acara Ruangan'}</p>
+                    <p class="mb-0 small text-truncate">${res.reason || 'Acara Ruangan'}</p>
                 </div>
             `;
         }

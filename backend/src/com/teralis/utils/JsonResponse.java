@@ -1,13 +1,17 @@
 package com.teralis.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 
 public class JsonResponse {
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder()
+            .setDateFormat("yyyy-MM-dd")
+            .create();
 
     public static void send(HttpServletResponse resp, Object data) throws IOException{
         resp.setContentType("application/json");
