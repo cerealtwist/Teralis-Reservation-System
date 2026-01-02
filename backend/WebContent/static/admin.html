@@ -10,6 +10,9 @@
     <style>
         :root { --pc-primary: var(--primary-red); }
         .btn-primary { background-color: var(--primary-red); border-color: var(--primary-red); }
+        /* Styling tambahan agar section yang tidak aktif tersembunyi */
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
     </style>
 </head>
 
@@ -24,10 +27,25 @@
             <div class="navbar-content">
                 <ul class="pc-navbar">
                     <li class="pc-item pc-caption"><label>Manajemen</label></li>
-                    <li class="pc-item active">
-                        <a href="admin.html" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+                    
+                    <li class="pc-item active" id="nav-reservasi">
+                        <a href="#" class="pc-link" onclick="switchView('reservasi')">
+                            <span class="pc-micon"><i class="ti ti-calendar-event"></i></span>
                             <span class="pc-mtext">Daftar Reservasi</span>
+                        </a>
+                    </li>
+
+                    <li class="pc-item" id="nav-users">
+                        <a href="#" class="pc-link" onclick="switchView('users')">
+                            <span class="pc-micon"><i class="ti ti-users"></i></span>
+                            <span class="pc-mtext">Kelola User</span>
+                        </a>
+                    </li>
+
+                    <li class="pc-item">
+                        <a href="#" class="pc-link text-danger" onclick="handleLogout()">
+                            <span class="pc-micon"><i class="ti ti-logout"></i></span>
+                            <span class="pc-mtext">Logout</span>
                         </a>
                     </li>
                 </ul>
@@ -37,47 +55,89 @@
 
     <div class="pc-container">
         <div class="pc-content">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5>Persetujuan Ruangan</h5>
-                            <div class="d-flex gap-2">
-                                <select id="filterStatus" class="form-select form-select-sm" style="width: 150px;">
-                                    <option value="">Semua Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="rejected">Rejected</option>
-                                </select>
+            
+            <div id="section-reservasi" class="admin-section active">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Persetujuan Ruangan</h5>
+                                <div class="d-flex gap-2">
+                                    <input type="date" id="filterDate" class="form-control form-control-sm" style="width: 160px;" onclick="this.showPicker()">
+                                    <select id="filterStatus" class="form-select form-select-sm" style="width: 150px;">
+                                        <option value="">Semua Status</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body shadow-sm">
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="resTable">
-                                    <thead>
-                                        <tr>
-                                            <th>User</th>
-                                            <th>Ruangan</th>
-                                            <th>Waktu</th>
-                                            <th>Dokumen</th>
-                                            <th>Status</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="reservation-list">
-                                        </tbody>
-                                </table>
+                            <div class="card-body shadow-sm">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>User</th>
+                                                <th>Ruangan</th>
+                                                <th>Waktu</th>
+                                                <th>Dokumen</th>
+                                                <th>Status</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reservation-list"></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div id="section-users" class="admin-section">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Daftar Pengguna Sistem</h5>
+                                <div class="d-flex gap-2">
+                                    <select id="filterRole" class="form-select form-select-sm" style="width: 150px;">
+                                        <option value="">Semua Role</option>
+                                        <option value="student">Student</option>
+                                        <option value="lecturer">Lecturer</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nama</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="user-list"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script src="assets/admin/js/plugins/popper.min.js"></script>
     <script src="assets/admin/js/plugins/bootstrap.min.js"></script>
     <script src="assets/admin/js/pcoded.js"></script>
+    <script src="assets/js/session.js"></script>
+    <script>checkSession(['admin']);</script>
     <script src="assets/js/admin-dashboard.js"></script>
 </body>
 </html>
