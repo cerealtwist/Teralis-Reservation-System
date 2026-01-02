@@ -11,32 +11,55 @@
 
     <!-- Design System -->
     <link rel="stylesheet" href="assets/css/design-system.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
     <link rel="stylesheet" href="assets/css/status.css">
+    
 </head>
 
 <body class="bg-light">
 
 <!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-auth fixed-top shadow-sm bg-white">
-    <div class="container">
-        <a class="navbar-brand" href="index.html">
-            <img src="assets/icons/teralis-logo-red.svg" alt="Teralis" height="28">
-        </a>
+<nav class="navbar navbar-expand-lg navbar-auth fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <img
+        src="../static/assets/icons/teralis-logo-red.svg"
+        alt="Teralis Logo"
+      >
+    </a>
 
-        <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav gap-3 align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="room.html">Ruangan</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="status.html">Status</a>
-                </li>
-            </ul>
-        </div>
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav nav-main me-4">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <img src="../static/assets/icons/home.svg" class="nav-icon" alt="">
+            <span>Home</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="room.html">
+            <img src="../static/assets/icons/ruangan.svg" class="nav-icon" alt="">
+            <span>Ruangan</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            <img src="../static/assets/icons/petunjuk.svg" class="nav-icon" alt="">
+            <span>Petunjuk</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="status.html">
+            <img src="../static/assets/icons/petunjuk.svg" class="nav-icon" alt="">
+            <span>Status</span>
+          </a>
+        </li>
+      </ul>
+
+      <a href="login.html" id="login-nav-btn" class="btn-login" style="display: none;">Login</a>
+      <a href="#" id="logout-nav-btn" class="btn-login" style="display: none;" onclick="handleLogout()">Logout</a>
     </div>
+  </div>
 </nav>
 
 <!-- ================= MAIN ================= -->
@@ -65,17 +88,15 @@
 
             <!-- Detail Card -->
             <div id="detail-card"
-                 class="bg-white rounded-4 shadow-sm p-5 border"
-                 style="display: none; min-height: 500px;">
-                <!-- Injected by JS -->
+                 class="bg-white rounded-4 shadow-sm p-5 border d-none"
+                 style="min-height: 500px;">
             </div>
 
             <!-- Empty State -->
             <div id="empty-state"
-                 class="d-flex flex-column align-items-center justify-content-center
-                        bg-white rounded-4 border shadow-sm"
+                 class="d-flex flex-column align-items-center justify-content-center bg-white rounded-4 border shadow-sm"
                  style="min-height: 500px;">
-                <img src="assets/icons/calendar.svg" width="60" class="mb-3">
+                <img src="assets/icons/calendar.svg" width="60" class="mb-3 opacity-25">
                 <p class="text-muted fw-medium">
                     Pilih reservasi di samping untuk melihat detail
                 </p>

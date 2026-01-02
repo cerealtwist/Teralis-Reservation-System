@@ -76,8 +76,17 @@ function showDetail(item) {
     const detailCard = document.getElementById('detail-card');
     const emptyState = document.getElementById('empty-state');
     
-    emptyState.style.display = 'none';
-    detailCard.style.display = 'block';
+    // classList untuk menyembunyikan/menampilkan
+    // Menghapus d-flex dan menambah d-none pada empty-state
+    if (emptyState) {
+        emptyState.classList.remove('d-flex');
+        emptyState.classList.add('d-none');
+    }
+
+    // Menghapus d-none pada detail-card
+    if (detailCard) {
+        detailCard.classList.remove('d-none');
+    }
 
     const statusBadge = item.status === 'pending' ? 'bg-warning' : (item.status === 'approved' ? 'bg-success' : 'bg-danger');
     const statusText = item.status === 'pending' ? 'Menunggu' : (item.status === 'approved' ? 'Disetujui' : 'Ditolak');
@@ -88,7 +97,7 @@ function showDetail(item) {
         
         <div class="d-flex justify-content-between align-items-start mb-4">
             <div class="d-flex gap-4">
-                <img src="assets/img/${item.roomImage || 'default.png'}" width="120" class="rounded-4 shadow-sm">
+                <img src="assets/img/${item.roomImage || 'default.png'}" width="120" height="120" class="rounded-4 shadow-sm object-fit-cover">
                 <div>
                     <h4 class="fw-bold mb-1">${item.roomName}</h4>
                     <p class="text-muted mb-1">${item.buildingName}</p>
@@ -96,14 +105,16 @@ function showDetail(item) {
                 </div>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-light rounded-3 p-3 text-center"><img src="assets/icons/calendar.svg" width="20"><br><small>Reschedule</small></button>
-                <button class="btn btn-light rounded-3 p-3 text-center text-danger" onclick="cancelReservation(${item.id})">
-                    <img src="assets/icons/cancel.svg" width="20"><br><small>Cancel</small>
+                <button class="btn btn-light rounded-3 p-3 text-center border shadow-sm">
+                    <img src="assets/icons/calendar.svg" width="20"><br><small>Reschedule</small>
+                </button>
+                <button class="btn btn-light rounded-3 p-3 text-center text-danger border shadow-sm" onclick="cancelReservation(${item.id})">
+                    <img src="assets/icons/clock.svg" width="20" style="filter: invert(21%) sepia(100%) saturate(7414%) hue-rotate(354deg) brightness(92%) contrast(93%);"><br><small>Cancel</small>
                 </button>
             </div>
         </div>
 
-        <div class="p-4 bg-light rounded-4 mb-4">
+        <div class="p-4 bg-light rounded-4 mb-4 border">
             <h6 class="fw-bold mb-3">Kegiatan: ${item.reason}</h6>
             <p class="mb-0 text-muted">${item.startTime.substring(0,5)} - ${item.endTime.substring(0,5)}</p>
         </div>
