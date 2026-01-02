@@ -10,7 +10,7 @@ function updateNavbarUI() {
         .then(response => {
             const loginBtn = document.getElementById('login-nav-btn');
             const logoutBtn = document.getElementById('logout-nav-btn');
-            // Ambil elemen tombol Reservasi di Hero
+            const statusNavItem = document.getElementById('status-nav-item'); // AMBIL ELEMEN STATUS
             const reservasiBtn = document.getElementById('hero-reservasi-btn');
             const currentPath = window.location.pathname;
 
@@ -18,8 +18,9 @@ function updateNavbarUI() {
                 // --- USER SUDAH LOGIN ---
                 if (loginBtn) loginBtn.style.display = 'none';
                 if (logoutBtn) logoutBtn.style.display = 'block';
+                if (statusNavItem) statusNavItem.style.display = 'block'; // TAMPILKAN STATUS
                 
-                // LOGIc: Jika sudah login, arahkan ke room.html
+                // Jika sudah login, arahkan ke room.html
                 if (reservasiBtn) {
                     reservasiBtn.href = "room.html";
                 }
@@ -31,6 +32,7 @@ function updateNavbarUI() {
                 // --- USER BELUM LOGIN ---
                 if (loginBtn) loginBtn.style.display = 'block';
                 if (logoutBtn) logoutBtn.style.display = 'none';
+                if (statusNavItem) statusNavItem.style.display = 'none'; // SEMBUNYIKAN STATUS
                 
                 // Kembalikan ke login.html jika belum login
                 if (reservasiBtn) {

@@ -1,0 +1,68 @@
+/* Container Utama */
+.custom-accordion {
+    border: none;
+}
+
+.custom-accordion .accordion-item {
+    border: none;
+}
+
+/* Header Accordion */
+.custom-accordion .accordion-button {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1.5rem;
+    color: #334155;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: white;
+}
+
+/* Hover & Active State */
+.custom-accordion .accordion-button:not(.collapsed) {
+    background-color: #fff8f8;
+    color: var(--primary-red);
+    box-shadow: none;
+}
+
+/* Nomor Langkah */
+.step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background-color: var(--card-bg);
+    color: var(--text-neutral);
+    border-radius: 50%;
+    font-size: 0.85rem;
+}
+
+.accordion-button:not(.collapsed) .step-number {
+    background-color: var(--primary-red);
+    color: white;
+}
+
+/* Transisi Halus */
+.accordion-collapse {
+    transition: all 0.35s ease-in-out;
+}
+
+.accordion-body {
+    padding: 0 1.5rem 1.8rem 1.5rem;
+    line-height: 1.8;
+}
+
+/* Garis Indikator Samping */
+.accordion-item {
+    position: relative;
+}
+
+.accordion-button:not(.collapsed)::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary-red);
+}
