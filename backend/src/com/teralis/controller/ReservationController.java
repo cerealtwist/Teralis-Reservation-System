@@ -25,6 +25,9 @@ import java.util.List;
 public class ReservationController extends HttpServlet {
 
     private final ReservationDAO reservationDAO = new ReservationDAO();
+    private static class UpdateStatusRequest {
+        String status;
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -132,20 +135,29 @@ public class ReservationController extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            int id = PathUtil.getIdFromUrl(req);
+        
+            // Baca body JSON
+            UpdateStatusRequest data = JsonResponse.readBody(req, UpdateStatusRequest.class);
 
-        int id = PathUtil.getIdFromUrl(req);
+            // Cek apakah data atau status bernilai null
+            if (data == null || data.status == null || data.status.trim().isEmpty()) {
+                JsonResponse.error(resp, 400, "Invalid JSON data: Status is required");
+                return;
+            }
 
-        class UpdateStatus {
-            String status;
-        }
+            // Eksekusi Update ke Database
+            boolean isUpdated = reservationDAO.updateStatus(id, data.status);
 
-        // Untuk doPut biasanya tetap menggunakan JSON (bukan FormData)
-        UpdateStatus data = JsonResponse.readBody(req, UpdateStatus.class);
-
-        if (reservationDAO.updateStatus(id, data.status)) {
-            JsonResponse.success(resp, "Status updated");
-        } else {
-            JsonResponse.error(resp, 500, "Failed to update status");
+            if (isUpdated) {
+                JsonResponse.success(resp, "Status updated successfully to " + data.status);
+            } else {
+                JsonResponse.error(resp, 500, "Gagal memperbarui status di database (ID tidak ditemukan)");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JsonResponse.error(resp, 500, "Server Internal Error: " + e.getMessage());
         }
     }
 

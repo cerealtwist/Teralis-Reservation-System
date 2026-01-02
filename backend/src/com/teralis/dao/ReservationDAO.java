@@ -87,13 +87,26 @@ public class ReservationDAO {
 
     public List<Reservation> getAll() {
         List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservations ORDER BY created_at DESC";
+        String sql = """
+            SELECT r.*, u.name as user_name, u.role as user_role, rm.name as room_name 
+            FROM reservations r
+            JOIN users u ON r.user_id = u.id
+            JOIN rooms rm ON r.room_id = rm.id
+            ORDER BY r.date DESC
+        """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql);
              ResultSet rs = statement.executeQuery()) {
 
-            while (rs.next()) list.add(map(rs));
+            while (rs.next()) {
+                Reservation r = map(rs);
+                // Set data tambahan hasil JOIN
+                r.setUserName(rs.getString("user_name"));
+                r.setUserRole(rs.getString("user_role"));
+                r.setRoomName(rs.getString("room_name")); // Pastikan field roomName ada di model Reservation.java
+                list.add(r);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
