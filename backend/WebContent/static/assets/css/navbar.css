@@ -31,7 +31,7 @@
 
 .nav-link.active,
 .nav-link:hover {
-  color: var(--primary-red);
+  color: var(--primary-red) !important; 
 }
 
 .nav-link span {

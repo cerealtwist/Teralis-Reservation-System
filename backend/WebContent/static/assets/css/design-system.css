@@ -15,3 +15,10 @@ body {
   color: var(--text-neutral);
 }
 
+body:has(.navbar-auth) {
+    padding-top: 20px; 
+}
+
+main.mt-5 {
+    margin-top: 6rem !important; 
+}

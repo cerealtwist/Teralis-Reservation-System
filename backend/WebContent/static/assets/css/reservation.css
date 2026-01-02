@@ -2,12 +2,12 @@
    DESIGN TOKENS
 ================================ */
 :root {
-    --telkom-red: #E1251B;
-    --telkom-red-hover: #b31d15;
-    --gray-light: #f8f9fa;
-    --gray-border: #dee2e6;
+    --telkom-red: var(--primary-red); 
+    --telkom-red-hover: #B51F1F; /* Warna merah yang sedikit lebih gelap untuk hover */
+    --gray-light: var(--card-bg);
+    --gray-border: var(--border-neutral);
     --text-dark: #212529;
-    --text-muted: #6c757d;
+    --text-muted: var(--text-neutral);
 }
 
 /* ================================
@@ -106,7 +106,7 @@
     left: 0;
     height: 4px;
     width: 0%;
-    background-color: var(--telkom-red);
+    background-color: var(--primary-red);
     border-radius: 4px;
     z-index: 2;
     transition: width 0.4s ease;
