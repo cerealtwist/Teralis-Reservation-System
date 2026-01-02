@@ -29,7 +29,13 @@ function roomCardTemplate(room, buildingName) {
 
   // Jika room.imageUrl ada di database, gunakan itu. 
   // Jika kosong, gunakan gambar default 'telu-building.png'
-  const imageSource = room.imageUrl ? `assets/img/${room.imageUrl}` : `assets/img/telu-building.png`;
+  const contextPath = "/WebContent"; 
+  const defaultImage = `${contextPath}/assets/img/telu-building.png`;
+    
+    // Pastikan path gambar menggunakan contextPath
+  const imageSource = room.imageUrl 
+        ? `${contextPath}/assets/img/${room.imageUrl}` 
+        : defaultImage;
 
   // URL halaman detail dengan parameter ID
   const detailUrl = `room-detail.html?id=${room.id}`;

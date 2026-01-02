@@ -10,9 +10,9 @@
     <style>
         :root { --pc-primary: var(--primary-red); }
         .btn-primary { background-color: var(--primary-red); border-color: var(--primary-red); }
-        /* Styling tambahan agar section yang tidak aktif tersembunyi */
         .admin-section { display: none; }
         .admin-section.active { display: block; }
+        .img-preview-table { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; }
     </style>
 </head>
 
@@ -27,21 +27,24 @@
             <div class="navbar-content">
                 <ul class="pc-navbar">
                     <li class="pc-item pc-caption"><label>Manajemen</label></li>
-                    
                     <li class="pc-item active" id="nav-reservasi">
                         <a href="#" class="pc-link" onclick="switchView('reservasi')">
                             <span class="pc-micon"><i class="ti ti-calendar-event"></i></span>
                             <span class="pc-mtext">Daftar Reservasi</span>
                         </a>
                     </li>
-
                     <li class="pc-item" id="nav-users">
                         <a href="#" class="pc-link" onclick="switchView('users')">
                             <span class="pc-micon"><i class="ti ti-users"></i></span>
                             <span class="pc-mtext">Kelola User</span>
                         </a>
                     </li>
-
+                    <li class="pc-item" id="nav-rooms">
+                        <a href="#" class="pc-link" onclick="switchView('rooms')">
+                            <span class="pc-micon"><i class="ti ti-building-community"></i></span>
+                            <span class="pc-mtext">Kelola Ruangan</span>
+                        </a>
+                    </li>
                     <li class="pc-item">
                         <a href="#" class="pc-link text-danger" onclick="handleLogout()">
                             <span class="pc-micon"><i class="ti ti-logout"></i></span>
@@ -55,81 +58,112 @@
 
     <div class="pc-container">
         <div class="pc-content">
-            
             <div id="section-reservasi" class="admin-section active">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5>Persetujuan Ruangan</h5>
-                                <div class="d-flex gap-2">
-                                    <input type="date" id="filterDate" class="form-control form-control-sm" style="width: 160px;" onclick="this.showPicker()">
-                                    <select id="filterStatus" class="form-select form-select-sm" style="width: 150px;">
-                                        <option value="">Semua Status</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="approved">Approved</option>
-                                        <option value="rejected">Rejected</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="card-body shadow-sm">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>User</th>
-                                                <th>Ruangan</th>
-                                                <th>Waktu</th>
-                                                <th>Dokumen</th>
-                                                <th>Status</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="reservation-list"></tbody>
-                                    </table>
-                                </div>
-                            </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Persetujuan Ruangan</h5>
+                        <div class="d-flex gap-2">
+                            <input type="date" id="filterDate" class="form-control form-control-sm" style="width: 160px;" onclick="this.showPicker()">
+                            <select id="filterStatus" class="form-select form-select-sm" style="width: 150px;">
+                                <option value="">Semua Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body shadow-sm">
+                        <div class="table-responsive">
+                            <table class="table table-hover"><thead id="res-head"></thead><tbody id="reservation-list"></tbody></table>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div id="section-users" class="admin-section">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5>Daftar Pengguna Sistem</h5>
-                                <div class="d-flex gap-2">
-                                    <select id="filterRole" class="form-select form-select-sm" style="width: 150px;">
-                                        <option value="">Semua Role</option>
-                                        <option value="student">Student</option>
-                                        <option value="lecturer">Lecturer</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Nama</th>
-                                                <th>Email</th>
-                                                <th>Role</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="user-list"></tbody>
-                                    </table>
-                                </div>
-                            </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Daftar Pengguna Sistem</h5>
+                        <select id="filterRole" class="form-select form-select-sm" style="width: 150px;"><option value="">Semua Role</option><option value="student">Student</option><option value="lecturer">Lecturer</option><option value="admin">Admin</option></select>
+                    </div>
+                    <div class="card-body"><div class="table-responsive"><table class="table table-hover"><thead><tr><th>ID</th><th>Nama</th><th>Email</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="user-list"></tbody></table></div></div>
+                </div>
+            </div>
+
+            <div id="section-rooms" class="admin-section">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Manajemen Ruangan & Fasilitas</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openRoomModal()"><i class="ti ti-plus"></i> Tambah Ruangan</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead><tr><th>Gambar</th><th>Nama Ruangan</th><th>Gedung</th><th>Kapasitas</th><th>Aksi</th></tr></thead>
+                                <tbody id="room-list"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <div class="modal-content">
+                <form id="roomForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="roomModalTitle">Tambah Ruangan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="room-id">
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Nama Ruangan</label>
+                                <input type="text" id="room-name" class="form-control" placeholder="Contoh: Aula Serbaguna" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Gedung</label>
+                                <select id="room-building" class="form-select" required></select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipe Ruangan</label>
+                                <input type="text" id="room-type" class="form-control" placeholder="Contoh: Aula, Lab, Rapat" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kapasitas (Orang)</label>
+                                <input type="number" id="room-capacity" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status Operasional</label>
+                                <select id="room-status" class="form-select" required>
+                                    <option value="available">Available (Siap Pinjam)</option>
+                                    <option value="maintenance">Maintenance (Perbaikan)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Fasilitas</label>
+                                <textarea id="room-facilities" class="form-control" rows="3" placeholder="Contoh: AC, Proyektor, Sound System, Kursi 50 unit"></textarea>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Foto Ruangan</label>
+                                <input type="file" id="room-image" class="form-control" accept="image/*">
+                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah gambar.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Ruangan</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

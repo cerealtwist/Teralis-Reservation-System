@@ -1,42 +1,177 @@
 document.addEventListener("DOMContentLoaded", function() {
+    // Muat data reservasi pertama kali
     loadReservations();
-
-    // Listener Filter Reservasi
-    const filterStatusEl = document.getElementById('filterStatus');
-    if (filterStatusEl) filterStatusEl.addEventListener('change', loadReservations);
     
-    const filterDateEl = document.getElementById('filterDate');
-    if (filterDateEl) filterDateEl.addEventListener('change', loadReservations);
-
-    // Listener Filter Role (User Management)
-    const filterRoleEl = document.getElementById('filterRole');
-    if (filterRoleEl) {
-        filterRoleEl.addEventListener('change', loadUsers);
-    }
+    // Listener Filter
+    document.getElementById('filterStatus')?.addEventListener('change', loadReservations);
+    document.getElementById('filterDate')?.addEventListener('change', loadReservations);
+    document.getElementById('filterRole')?.addEventListener('change', loadUsers);
 });
 
 /**
  * FUNGSI NAVIGASI: Berpindah antar section (SPA style)
  */
 function switchView(view) {
-    const resSection = document.getElementById('section-reservasi');
-    const userSection = document.getElementById('section-users');
-    const navRes = document.getElementById('nav-reservasi');
-    const navUser = document.getElementById('nav-users');
+    const sections = ['section-reservasi', 'section-users', 'section-rooms'];
+    const navs = ['nav-reservasi', 'nav-users', 'nav-rooms'];
+    
+    sections.forEach(s => document.getElementById(s).classList.remove('active'));
+    navs.forEach(n => document.getElementById(n)?.classList.remove('active'));
+    
+    document.getElementById(`section-${view}`).classList.add('active');
+    document.getElementById(`nav-${view}`)?.classList.add('active');
 
-    if (view === 'reservasi') {
-        resSection.classList.add('active');
-        userSection.classList.remove('active');
-        navRes.classList.add('active');
-        navUser.classList.remove('active');
-        loadReservations();
-    } else if (view === 'users') {
-        resSection.classList.remove('active');
-        userSection.classList.add('active');
-        navRes.classList.remove('active');
-        navUser.classList.add('active');
-        loadUsers();
+    if (view === 'reservasi') loadReservations();
+    else if (view === 'users') loadUsers();
+    else if (view === 'rooms') loadRooms();
+}
+
+// --- CRUD RUANGAN ---
+
+/**
+ * LOAD ROOMS: Mengambil daftar ruangan untuk tabel admin
+ */
+async function loadRooms() {
+    const tbody = document.getElementById('room-list');
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center">Memuat data ruangan...</td></tr>`;
+    try {
+        const res = await fetch('../api/rooms');
+        const rooms = await res.json();
+        tbody.innerHTML = "";
+        rooms.forEach(r => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><img src="../assets/img/${r.imageUrl || 'telu-building.png'}" class="img-preview-table"></td>
+                    <td>
+                        <div class="fw-bold">${r.name}</div>
+                        <small class="text-muted">${r.type || 'General'}</small>
+                    </td>
+                    <td>${r.buildingName}</td>
+                    <td>${r.capacity} Orang</td>
+                    <td>
+                        <button class="btn btn-sm btn-light-primary" onclick="editRoom(${r.id})" title="Edit"><i class="ti ti-edit"></i></button>
+                        <button class="btn btn-sm btn-light-danger" onclick="deleteRoom(${r.id})" title="Hapus"><i class="ti ti-trash"></i></button>
+                    </td>
+                </tr>`;
+        });
+    } catch (err) { 
+        console.error(err); 
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>`;
     }
+}
+
+/**
+ * OPEN MODAL: Reset form dan siapkan modal tambah/edit
+ */
+async function openRoomModal() {
+    const form = document.getElementById('roomForm');
+    form.reset();
+    document.getElementById('room-id').value = "";
+    document.getElementById('roomModalTitle').innerText = "Tambah Ruangan";
+    
+    await loadBuildingOptions();
+    new bootstrap.Modal(document.getElementById('roomModal')).show();
+}
+
+/**
+ * LOAD BUILDINGS: Mengambil opsi gedung untuk dropdown
+ */
+async function loadBuildingOptions() {
+    try {
+        const res = await fetch('../api/buildings');
+        const buildings = await res.json();
+        const select = document.getElementById('room-building');
+        select.innerHTML = buildings.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+    } catch (err) { console.error("Gagal memuat gedung:", err); }
+}
+
+/**
+ * FUNGSI SIMPAN RUANGAN (MULTIPART POST)
+ */
+document.getElementById('roomForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    const id = document.getElementById('room-id').value;
+
+    // Menambahkan field dasar
+    formData.append("name", document.getElementById('room-name').value);
+    formData.append("buildingId", document.getElementById('room-building').value);
+    formData.append("capacity", document.getElementById('room-capacity').value);
+    
+    // MENAMBAHKAN FIELD BARU (Type, Facilities, Status)
+    formData.append("type", document.getElementById('room-type').value);
+    formData.append("facilities", document.getElementById('room-facilities').value);
+    formData.append("status", document.getElementById('room-status').value);
+    
+    // Menambahkan file gambar jika ada
+    const fileInput = document.getElementById('room-image');
+    if (fileInput.files[0]) {
+        formData.append("image", fileInput.files[0]);
+    }
+
+    // Jika ada ID, arahkan ke endpoint update, jika tidak maka create
+    const url = id ? `../api/rooms/update?id=${id}` : `../api/rooms`;
+
+    try {
+        const res = await fetch(url, { method: 'POST', body: formData });
+        if (res.ok) {
+            alert("Data ruangan berhasil disimpan!");
+            const modalEl = document.getElementById('roomModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+            loadRooms();
+        } else {
+            const errData = await res.json();
+            alert("Gagal: " + (errData.message || "Terjadi kesalahan server"));
+        }
+    } catch (err) { 
+        console.error(err);
+        alert("Gagal menghubungi server."); 
+    }
+};
+
+/**
+ * EDIT ROOM: Mengambil detail ruangan dan mengisi modal
+ */
+async function editRoom(id) {
+    try {
+        const res = await fetch(`../api/rooms/${id}`);
+        if (!res.ok) throw new Error("Ruangan tidak ditemukan");
+        
+        const r = await res.json();
+        
+        document.getElementById('roomModalTitle').innerText = "Edit Ruangan";
+        document.getElementById('room-id').value = r.id;
+        document.getElementById('room-name').value = r.name;
+        document.getElementById('room-capacity').value = r.capacity;
+        
+        // MENGISI FIELD BARU KE MODAL
+        document.getElementById('room-type').value = r.type || "";
+        document.getElementById('room-facilities').value = r.facilities || "";
+        document.getElementById('room-status').value = r.status || "available";
+        
+        await loadBuildingOptions();
+        document.getElementById('room-building').value = r.buildingId;
+        
+        new bootstrap.Modal(document.getElementById('roomModal')).show();
+    } catch (err) {
+        console.error(err);
+        alert("Gagal mengambil data detail ruangan.");
+    }
+}
+
+/**
+ * DELETE ROOM
+ */
+async function deleteRoom(id) {
+    if (!confirm("Apakah Anda yakin ingin menghapus ruangan ini secara permanen?")) return;
+    try {
+        const res = await fetch(`../api/rooms/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            alert("Ruangan berhasil dihapus.");
+            loadRooms();
+        }
+    } catch (err) { console.error(err); }
 }
 
 /**
@@ -71,16 +206,27 @@ async function loadReservations() {
 
             tbody.innerHTML += `
                 <tr>
-                    <td><div class="fw-bold">${item.userName || 'Anonymous'}</div><small class="text-muted">${item.userRole || 'Student'}</small></td>
+                    <td>
+                        <div class="fw-bold">${item.userName || 'Anonymous'}</div>
+                        <small class="text-muted">${item.userRole || 'Student'}</small>
+                    </td>
                     <td>${item.roomName || 'N/A'}</td>
-                    <td><div>${item.date}</div><small class="text-muted">${sTime} - ${eTime}</small></td>
-                    <td>${item.documentPath ? `<a href="../uploads/${item.documentPath}" target="_blank" class="btn btn-sm btn-light-danger"><i class="ti ti-file-text"></i> Lihat Surat</a>` : '<span class="text-muted small">No File</span>'}</td>
+                    <td>
+                        <div>${item.date}</div>
+                        <small class="text-muted">${sTime} - ${eTime}</small>
+                    </td>
+                    <td>
+                        ${item.documentPath ? 
+                            `<a href="../uploads/${item.documentPath}" target="_blank" class="btn btn-sm btn-light-danger">
+                                <i class="ti ti-file-text"></i> Lihat Surat
+                             </a>` : '<span class="text-muted small">No File</span>'}
+                    </td>
                     <td><span class="badge ${getStatusClass(item.status)}">${item.status.toUpperCase()}</span></td>
                     <td>
                         ${item.status === 'pending' ? `
-                            <button onclick="updateStatus(${item.id}, 'approved')" class="btn btn-sm btn-success"><i class="ti ti-check"></i></button>
-                            <button onclick="updateStatus(${item.id}, 'rejected')" class="btn btn-sm btn-danger"><i class="ti ti-x"></i></button>
-                        ` : '<i class="ti ti-circle-check text-muted"></i>'}
+                            <button onclick="updateStatus(${item.id}, 'approved')" class="btn btn-sm btn-success" title="Setujui"><i class="ti ti-check"></i></button>
+                            <button onclick="updateStatus(${item.id}, 'rejected')" class="btn btn-sm btn-danger" title="Tolak"><i class="ti ti-x"></i></button>
+                        ` : '<i class="ti ti-circle-check text-muted"></i> Selesai'}
                     </td>
                 </tr>
             `;
@@ -106,7 +252,7 @@ async function loadUsers() {
         const filteredUsers = users.filter(user => !filterRole || user.role === filterRole);
 
         if (filteredUsers.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">User dengan role "${filterRole}" tidak ditemukan.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">User tidak ditemukan.</td></tr>`;
             return;
         }
 
@@ -118,7 +264,7 @@ async function loadUsers() {
                     <td>${user.email}</td>
                     <td><span class="badge ${getRoleClass(user.role)}">${user.role.toUpperCase()}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-light-danger" onclick="deleteUser(${user.id})"><i class="ti ti-trash"></i></button>
+                        <button class="btn btn-sm btn-light-danger" onclick="deleteUser(${user.id})" title="Hapus"><i class="ti ti-trash"></i></button>
                     </td>
                 </tr>
             `;
@@ -126,6 +272,9 @@ async function loadUsers() {
     } catch (err) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-warning">${err.message}</td></tr>`; }
 }
 
+/**
+ * HELPERS: Warna Status & Role
+ */
 function getStatusClass(status) {
     if (status === 'pending') return 'bg-warning text-dark';
     if (status === 'approved') return 'bg-success';
@@ -138,14 +287,20 @@ function getRoleClass(role) {
     return 'bg-light-primary text-primary';
 }
 
+/**
+ * UPDATE RESERVATION STATUS (Approve/Reject)
+ */
 async function updateStatus(id, newStatus) {
-    if (!confirm(`Ubah status ke ${newStatus}?`)) return;
+    if (!confirm(`Ubah status reservasi menjadi ${newStatus.toUpperCase()}?`)) return;
     try {
         const res = await fetch(`../api/reservations/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: newStatus })
         });
-        if (res.ok) { alert("Sukses!"); loadReservations(); }
-    } catch (err) { alert("Gagal update server."); }
+        if (res.ok) { 
+            alert("Status diperbarui!"); 
+            loadReservations(); 
+        }
+    } catch (err) { alert("Gagal update status ke server."); }
 }
