@@ -51,7 +51,7 @@ public class UserDAO {
     }
 
     public User getById(int id){
-        String sql = "SELECT * FROM users Where id = ?";
+        String sql = "SELECT * FROM users WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement statement = conn.prepareStatement(sql)){
                 statement.setInt(1, id);
@@ -67,14 +67,16 @@ public class UserDAO {
         return null;
     }
 
+    // PERBAIKAN 1: Tambahkan nim_nip ke INSERT
     public boolean createUser(User u){
-        String sql = "INSERT INTO users(name, email, password, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users(name, nim_nip, email, password, role) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement statement = conn.prepareStatement(sql)){
                 statement.setString(1, u.getName());
-                statement.setString(2, u.getEmail());
-                statement.setString(3, u.getPasswordHash());
-                statement.setString(4, u.getRole());
+                statement.setString(2, u.getNimNip()); // Tambahkan ini
+                statement.setString(3, u.getEmail());
+                statement.setString(4, u.getPasswordHash());
+                statement.setString(5, u.getRole());
                 
                 return statement.executeUpdate() > 0;
 
@@ -85,17 +87,18 @@ public class UserDAO {
         return false;
     }
 
-     // --- UPDATE USER (Admin or self-update) ---
+     // PERBAIKAN 2: Tambahkan nim_nip ke UPDATE
     public boolean updateUser(int id, User u) {
-        String sql = "UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?";
+        String sql = "UPDATE users SET name = ?, nim_nip = ?, email = ?, role = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement st = conn.prepareStatement(sql)) {
 
             st.setString(1, u.getName());
-            st.setString(2, u.getEmail());
-            st.setString(3, u.getRole());
-            st.setInt(4, id);
+            st.setString(2, u.getNimNip()); // Tambahkan ini
+            st.setString(3, u.getEmail());
+            st.setString(4, u.getRole());
+            st.setInt(5, id);
 
             return st.executeUpdate() > 0;
 
@@ -106,7 +109,7 @@ public class UserDAO {
         return false;
     }
 
-    // --- DELETE USER ---
+    // -- DELETE USER --
     public boolean delete(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
 
@@ -123,6 +126,7 @@ public class UserDAO {
         return false;
     }
 
+    // PERBAIKAN 3: Ambil nim_nip dari ResultSet
     private User mapToUser(ResultSet rs) throws SQLException{
         String role = rs.getString("role");
         User u = null;
@@ -143,6 +147,7 @@ public class UserDAO {
 
         u.setId(rs.getInt("id"));
         u.setName(rs.getString("name"));
+        u.setNimNip(rs.getString("nim_nip")); // Ambil nilai nim_nip dari database
         u.setEmail(rs.getString("email"));
         u.setPasswordHash(rs.getString("password"));
         u.setRole(role);

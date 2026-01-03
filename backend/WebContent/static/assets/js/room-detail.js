@@ -1,6 +1,7 @@
 // STATE KALENDER
 let currentViewDate = new Date(); 
 let currentViewMode = 'week';
+window.CONTEXT_PATH = window.CONTEXT_PATH || '/WebContent';
 
 document.addEventListener("DOMContentLoaded", function() {
     const params = new URLSearchParams(window.location.search);
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     initCalendarListeners(roomId);
 
     // Gunakan path relatif agar konsisten dengan halaman lain
-    fetch(`api/rooms/${roomId}`)
+    fetch(`${CONTEXT_PATH}/api/rooms/${roomId}`)
         .then(res => res.json())
         .then(room => {
             renderRoomInfo(room);
@@ -36,8 +37,17 @@ function renderRoomInfo(room) {
     document.getElementById('breadcrumb-building-link').textContent = room.buildingName;
     document.getElementById('breadcrumb-room-active').textContent = room.name;
     
-    const imgPath = room.imageUrl ? `assets/img/${room.imageUrl}` : 'assets/img/telu-building.png';
-    document.getElementById('img-main').src = imgPath;
+    const defaultImg = `${window.CONTEXT_PATH}/assets/img/telu-building.png`;
+    const imgPath = room.imageUrl ? `${window.CONTEXT_PATH}/assets/img/${room.imageUrl}` : defaultImg;
+    const imgElement = document.getElementById('img-main');
+    
+    imgElement.src = imgPath;
+    // Fallback otomatis jika gambar utama 404
+    imgElement.onerror = function() {
+        this.src = defaultImg;
+        this.onerror = null; 
+    };
+
     document.getElementById('btn-reservasi').href = `reservation.html?room_id=${room.id}`;
 }
 
@@ -132,7 +142,7 @@ function renderCalendarBase() {
 async function loadReservations(roomId) {
     try {
         // Gunakan path relatif agar aman dari masalah folder konteks server
-        const res = await fetch(`api/reservations?room_id=${roomId}`);
+        const res = await fetch(`${window.CONTEXT_PATH}/api/reservations?room_id=${roomId}`);
         const reservations = await res.json();
         renderReservationsOnGrid(reservations);
     } catch (err) {

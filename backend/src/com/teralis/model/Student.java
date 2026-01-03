@@ -5,8 +5,8 @@ public class Student extends User {
         this.role = "student";
     }
 
-    public Student(int id, String name, String email, String passwordHash){
-        super(id, name, email, passwordHash, "student");
+    public Student(int id, String nimNip, String name, String email, String passwordHash){
+        super(id, nimNip, name, email, passwordHash, "student");
     }
 
     @Override

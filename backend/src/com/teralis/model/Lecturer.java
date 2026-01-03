@@ -4,8 +4,8 @@ public class Lecturer extends User {
     public Lecturer() {
         this.role = "lecturer";
     }
-    public Lecturer(int id, String nama, String email, String password) {
-        super(id, nama, email, password, "lecturer");
+    public Lecturer(int id, String nimNip, String nama, String email, String password) {
+        super(id, nimNip, nama, email, password, "lecturer");
     }
 
     @Override

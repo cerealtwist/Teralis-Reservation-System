@@ -3,14 +3,16 @@ package com.teralis.model;
 public abstract class User {
     protected int id;
     protected String name;
+    protected String nimNip;
     protected String email;
     protected String passwordHash;
     protected String role; // student, lecturer, admin
 
     public User() {}
 
-    public User(int id, String name, String email, String passwordHash, String role){
+    public User(int id, String nimNip, String name, String email, String passwordHash, String role){
         this.id = id;
+        this.nimNip = nimNip;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -59,5 +61,13 @@ public abstract class User {
 
     public void setRole(String role){
         this.role = role;
+    }
+
+    public String getNimNip() {
+        return nimNip;
+    }
+
+    public void setNimNip(String nimNip) {
+        this.nimNip = nimNip;
     }
 }

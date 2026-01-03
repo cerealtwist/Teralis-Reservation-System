@@ -176,17 +176,21 @@
       const result = await response.json();
 
       if (response.ok) {
-        // --- Redirect Berdasarkan role ---
-        if (result.role === 'admin') {
-            window.location.href = "admin.html";
-        } else if (result.role === 'lecturer' || result.role === 'student') {
-            window.location.href = "room.html";
-        } else {
-            // Fallback if role = undefined!
-            window.location.href = "index.html";
-        }
-      } else {
-        errorDisplay.textContent = result.message || "Login gagal, silakan coba lagi.";
+          // SIMPAN DATA KE LOCALSTORAGE
+          // so reservation-form.js bisa mengambil nama asli
+          localStorage.setItem('userName', result.name);
+          localStorage.setItem('userNimNip', result.nimNip);
+          localStorage.setItem('userId', result.id);
+          localStorage.setItem('role', result.role);
+
+          // REDIRECT BY ROLE
+          if (result.role === 'admin') {
+              window.location.href = "admin.html";
+          } else if (result.role === 'lecturer' || result.role === 'student') {
+              window.location.href = "room.html";
+          } else {
+              window.location.href = "index.html";
+          }
       }
     } catch (error) {
         console.error("Fetch error:", error);
