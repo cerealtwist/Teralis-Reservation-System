@@ -152,24 +152,37 @@ async function loadReservations(roomId) {
 
 function renderReservationsOnGrid(reservations) {
     reservations.forEach(res => {
-        // Hanya tampilkan yang sudah disetujui (Approved)
         if (res.status !== 'approved') return;
 
-        const startHour = res.startTime.split(':')[0];
-        const endHour = res.endTime.split(':')[0];
-        const duration = parseInt(endHour) - parseInt(startHour);
+        // 1. Pecah jam dan menit
+        const [startH, startM] = res.startTime.split(':').map(Number);
+        const [endH, endM] = res.endTime.split(':').map(Number);
 
-        // ID target (Misal: cell-2026-01-01-09)
-        const targetCellId = `cell-${res.date}-${startHour}`;
+        // 2. Konversi ke format desimal jam (misal 02:45 -> 2.75)
+        let startDecimal = startH + (startM / 60);
+        let endDecimal = endH + (endM / 60);
+
+        // 3. SAFETY LOGIC: Jika durasi negatif, asumsikan itu adalah PM
+        // Contoh: 02:45 (2.75) - 09:00 (9.0) = -6.25 -> Tambahkan 12 jam menjadi 5.75 jam
+        if (endDecimal < startDecimal) {
+            endDecimal += 12;
+        }
+
+        const duration = endDecimal - startDecimal;
+
+        // 4. Target ID sel berdasarkan jam mulai
+        const targetCellId = `cell-${res.date}-${startH.toString().padStart(2, '0')}`;
         const targetCell = document.getElementById(targetCellId);
         
         if (targetCell) {
+            // Berikan position absolute dan width agar tidak tergencet grid
             targetCell.innerHTML = `
-                <div class="event-card-green shadow-sm" style="height: calc(${duration * 100}% - 8px); z-index: 10;">
-                    <strong>${res.userName || 'User'} (${duration} jam)</strong>
+                <div class="event-card-green shadow-sm" 
+                     style="height: calc(${duration * 100}% - 8px); z-index: 10; position: absolute; width: 95%; left: 2px;">
+                    <strong class="d-block text-truncate">${res.userName || 'User'} (${duration.toFixed(1)} jam)</strong>
                     <small class="d-block opacity-75">${res.userRole || ''}</small>
                     <hr class="my-1 opacity-25">
-                    <p class="mb-0 small text-truncate">${res.reason || 'Acara Ruangan'}</p>
+                    <p class="mb-0 small text-truncate" title="${res.reason}">${res.reason || 'Kegiatan'}</p>
                 </div>
             `;
         }

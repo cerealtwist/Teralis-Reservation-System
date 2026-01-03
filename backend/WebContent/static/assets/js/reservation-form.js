@@ -142,40 +142,71 @@ function initUploadLogic() {
 }
 
 function submitReservation() {
-    // Validasi Sederhana: Harus ada file yang diunggah
+    // 1. Validasi File: Harus ada file yang diunggah
     if (uploadedFiles.length === 0) {
         alert("Mohon unggah surat permohonan terlebih dahulu.");
         return;
     }
 
+    // 2. Ambil Nilai Waktu untuk Validasi
+    const startTimeRaw = document.getElementById('start_time').value; // format "HH:mm"
+    const endTimeRaw = document.getElementById('end_time').value;
+
+    if (!startTimeRaw || !endTimeRaw) {
+        alert("Mohon isi waktu mulai dan selesai.");
+        return;
+    }
+
+    // 3. Logika Validasi Waktu (Mencegah Durasi Negatif)
+    // Mengonversi waktu ke menit total untuk perbandingan objektif
+    const [sH, sM] = startTimeRaw.split(':').map(Number);
+    const [eH, eM] = endTimeRaw.split(':').map(Number);
+    const startTotal = sH * 60 + sM;
+    const endTotal = eH * 60 + eM;
+
+    if (endTotal <= startTotal) {
+        alert("Waktu Selesai harus lebih besar dari Waktu Mulai. \n\nTips: Jika Anda memesan untuk siang hari (misal 2 siang), pastikan input menggunakan format 24 jam (14:00) atau PM.");
+        return;
+    }
+
+    // 4. Persiapan Pengiriman
     const btn = document.getElementById('btnNext');
     btn.disabled = true;
     btn.textContent = "Mengirim...";
 
-    // Gunakan FormData  (mengirim FILE)
+    // Gunakan FormData untuk mengirim teks dan file sekaligus
     const formData = new FormData();
     formData.append("roomId", document.getElementById('room_id').value);
     formData.append("date", document.getElementById('res_date').value);
-    formData.append("startTime", document.getElementById('start_time').value + ":00");
-    formData.append("endTime", document.getElementById('end_time').value + ":00");
+    
+    // Kirim dengan format HH:mm:ss sesuai ekspektasi Time.valueOf() di Java
+    formData.append("startTime", startTimeRaw + ":00");
+    formData.append("endTime", endTimeRaw + ":00");
     formData.append("reason", document.getElementById('purpose').value);
     
+    // Append file satu per satu ke dalam field "files"
     uploadedFiles.forEach((file) => {
         formData.append("files", file);
     });
 
+    // 5. Eksekusi Request ke API
     fetch('/WebContent/api/reservations', {
         method: 'POST',
         body: formData 
     })
-    .then(res => res.json())
+    .then(async res => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.message || "Gagal mengirim reservasi");
+        return result;
+    })
     .then(result => {
         alert("Reservasi Berhasil Diajukan!");
         window.location.href = "status.html";
     })
     .catch(err => {
-        console.error(err);
-        alert("Gagal mengirim reservasi.");
+        console.error("Submission Error:", err);
+        // Tampilkan pesan error spesifik (misal: "Time slot already booked")
+        alert("Error: " + err.message);
         btn.disabled = false;
         btn.textContent = "Kirim Reservasi";
     });
