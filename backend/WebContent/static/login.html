@@ -176,10 +176,16 @@
       const result = await response.json();
 
       if (response.ok) {
-        // Login Sukses, arahkan ke halaman student atau dashboard utama
-        window.location.href = result.role + ".html";
+        // --- Redirect Berdasarkan role ---
+        if (result.role === 'admin') {
+            window.location.href = "admin.html";
+        } else if (result.role === 'lecturer' || result.role === 'student') {
+            window.location.href = "room.html";
+        } else {
+            // Fallback if role = undefined!
+            window.location.href = "index.html";
+        }
       } else {
-        // Tampilkan pesan error dari backend (misal: "Invalid Credentials")
         errorDisplay.textContent = result.message || "Login gagal, silakan coba lagi.";
       }
     } catch (error) {
