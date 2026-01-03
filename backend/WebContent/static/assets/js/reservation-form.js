@@ -11,10 +11,26 @@ document.addEventListener("DOMContentLoaded", function() {
         fetchRooms(roomId);
     }
 
-    // 2. Auto-fill Data Peminjam dari Session/LocalStorage
-    // Analogi: Seperti fitur 'Auto-complete' agar user tidak mengetik NIM yang sama berulang kali.
-    document.getElementById('user_name').value = localStorage.getItem('userName') || 'Mahasiswa 1';
-    document.getElementById('user_id_display').value = localStorage.getItem('userId') || 'NIM';
+    // 2. Auto-fill Data Peminjam dari LocalStorage (Integrasi NIM/NIP)
+    // Mengambil data yang disimpan saat login untuk menghindari fallback "Mahasiswa 1"
+    const savedName = localStorage.getItem('userName');
+    const savedNimNip = localStorage.getItem('userNimNip'); 
+    const savedUserId = localStorage.getItem('userId');
+
+    if (savedName && savedNimNip) {
+        // Mengisi field tampilan untuk user
+        document.getElementById('user_name').value = savedName || "";
+        document.getElementById('user_id_display').value = savedNimNip || "";
+        
+        // Mengisi hidden input untuk pengiriman data ke backend (ID Database)
+        const hiddenUserId = document.getElementById('user_id');
+        if (hiddenUserId) hiddenUserId.value = savedUserId || "";
+    } else {
+        // Proteksi: Jika data tidak ditemukan di browser, paksa login ulang
+        alert("Sesi tidak ditemukan atau berakhir. Silakan login kembali.");
+        window.location.href = "login.html";
+        return;
+    }
 
     // 3. Inisialisasi Logika Dropzone
     initUploadLogic();

@@ -2,18 +2,25 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchUserReservations();
 });
 
+// Inisialisasi Context Path
+window.CONTEXT_PATH = window.CONTEXT_PATH || '/WebContent';
+
 async function fetchUserReservations() {
     try {
-        // Memanggil API yang sudah Anda buat di ReservationController.java
-        const res = await fetch('/WebContent/api/reservations');
+        const res = await fetch(`${window.CONTEXT_PATH}/api/reservations`);
         const list = await res.json();
 
         const upcomingContainer = document.getElementById('upcoming-list');
         const historyContainer = document.getElementById('history-list');
 
+        // Reset kontainer sebelum render (Avoid duplication)
+        if (upcomingContainer) upcomingContainer.innerHTML = "";
+        if (historyContainer) historyContainer.innerHTML = "";
+
         list.forEach(item => {
             const card = createReservationItem(item);
-            // Pisahkan berdasarkan status atau tanggal
+            
+            // Menunggu & Disetujui masuk ke 'Upcoming', sisanya ke 'History'
             if (item.status === 'pending' || item.status === 'approved') {
                 upcomingContainer.appendChild(card);
             } else {
@@ -28,9 +35,14 @@ async function fetchUserReservations() {
 function createReservationItem(item) {
     const div = document.createElement('div');
     div.className = 'reservation-item';
+
+    // Context path + Fallback telu-building.png
+    const defaultImg = `${window.CONTEXT_PATH}/assets/img/telu-building.png`;
+    const imgPath = item.roomImage ? `${window.CONTEXT_PATH}/assets/img/${item.roomImage}` : defaultImg;
+
     div.innerHTML = `
         <div class="d-flex gap-3 align-items-center">
-            <img src="assets/img/${item.roomImage || 'default.png'}" class="thumb">
+            <img src="${imgPath}" class="thumb" onerror="this.src='${defaultImg}'">
             <div>
                 <small class="text-muted">${item.date} ${item.startTime.substring(0,5)}</small>
                 <div class="fw-bold">${item.roomName}</div>
@@ -53,7 +65,8 @@ async function cancelReservation(id) {
     if (!confirm("Apakah Anda yakin ingin membatalkan reservasi ini?")) return;
 
     try {
-        const res = await fetch(`/WebContent/api/reservations/${id}`, {
+        // DELETE harus absolut mengarah ke ReservationController
+        const res = await fetch(`${window.CONTEXT_PATH}/api/reservations/${id}`, {
             method: 'DELETE'
         });
 
@@ -61,7 +74,6 @@ async function cancelReservation(id) {
 
         if (res.ok) {
             alert("Reservasi berhasil dibatalkan.");
-            // Refresh halaman agar daftar terupdate
             window.location.reload();
         } else {
             alert("Gagal membatalkan: " + result.message);
@@ -76,20 +88,23 @@ function showDetail(item) {
     const detailCard = document.getElementById('detail-card');
     const emptyState = document.getElementById('empty-state');
     
-    // classList untuk menyembunyikan/menampilkan
-    // Menghapus d-flex dan menambah d-none pada empty-state
+    // UI Logic: Sembunyikan empty state dan tampilkan card detail
     if (emptyState) {
         emptyState.classList.remove('d-flex');
         emptyState.classList.add('d-none');
     }
 
-    // Menghapus d-none pada detail-card
     if (detailCard) {
         detailCard.classList.remove('d-none');
     }
 
+    // Pemetaan warna badge berdasarkan status dari database
     const statusBadge = item.status === 'pending' ? 'bg-warning' : (item.status === 'approved' ? 'bg-success' : 'bg-danger');
     const statusText = item.status === 'pending' ? 'Menunggu' : (item.status === 'approved' ? 'Disetujui' : 'Ditolak');
+
+    // Jalur gambar untuk tampilan detail utama
+    const defaultImg = `${window.CONTEXT_PATH}/assets/img/telu-building.png`;
+    const imgPath = item.roomImage ? `${window.CONTEXT_PATH}/assets/img/${item.roomImage}` : defaultImg;
 
     detailCard.innerHTML = `
         <h2 class="fw-bold mb-4">${item.date} at ${item.startTime.substring(0,5)}</h2>
@@ -97,7 +112,7 @@ function showDetail(item) {
         
         <div class="d-flex justify-content-between align-items-start mb-4">
             <div class="d-flex gap-4">
-                <img src="assets/img/${item.roomImage || 'default.png'}" width="120" height="120" class="rounded-4 shadow-sm object-fit-cover">
+                <img src="${imgPath}" onerror="this.src='${defaultImg}'" width="120" height="120" class="rounded-4 shadow-sm object-fit-cover">
                 <div>
                     <h4 class="fw-bold mb-1">${item.roomName}</h4>
                     <p class="text-muted mb-1">${item.buildingName}</p>
@@ -106,10 +121,10 @@ function showDetail(item) {
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-light rounded-3 p-3 text-center border shadow-sm">
-                    <img src="assets/icons/calendar.svg" width="20"><br><small>Reschedule</small>
+                    <img src="${window.CONTEXT_PATH}/static/assets/icons/calendar.svg" width="20"><br><small>Reschedule</small>
                 </button>
                 <button class="btn btn-light rounded-3 p-3 text-center text-danger border shadow-sm" onclick="cancelReservation(${item.id})">
-                    <img src="assets/icons/clock.svg" width="20" style="filter: invert(21%) sepia(100%) saturate(7414%) hue-rotate(354deg) brightness(92%) contrast(93%);"><br><small>Cancel</small>
+                    <img src="${window.CONTEXT_PATH}/static/assets/icons/clock.svg" width="20" style="filter: invert(21%) sepia(100%) saturate(7414%) hue-rotate(354deg) brightness(92%) contrast(93%);"><br><small>Cancel</small>
                 </button>
             </div>
         </div>

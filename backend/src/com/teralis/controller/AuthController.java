@@ -24,11 +24,17 @@ public class AuthController extends HttpServlet {
         public String status;
         public String message;
         public String role;
+        public int id;
+        public String name;
+        public String nimNip;
 
-        public LoginResponse(String status, String message, String role) {
+        public LoginResponse(String status, String message, String role, int id, String name, String nimNip) {
             this.status = status;
             this.message = message;
             this.role = role;
+            this.id = id;
+            this.name = name;
+            this.nimNip = nimNip;
         }
     }
 
@@ -71,8 +77,16 @@ public class AuthController extends HttpServlet {
         session.setAttribute("userId", user.getId());
         session.setAttribute("role", user.getRole());
         session.setAttribute("email", user.getEmail());
+        session.setAttribute("name", user.getName());
 
-        JsonResponse.send(resp, new LoginResponse("success", "Login success.", user.getRole()));
+        JsonResponse.send(resp, new LoginResponse(
+            "success", 
+            "Login success.", 
+            user.getRole(), 
+            user.getId(), 
+            user.getName(), 
+            user.getNimNip() // Data ini diambil dari model User.java
+        ));
 
     }
 
@@ -95,8 +109,17 @@ public class AuthController extends HttpServlet {
     private void handleStatus(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session != null && session.getAttribute("userId") != null) {
-            String role = (String) session.getAttribute("role");
-            JsonResponse.send(resp, new LoginResponse("success", "Authenticated", role));
+            int id = (int) session.getAttribute("userId");
+            // Ambil data terbaru dari DB agar sinkron
+            User user = userDAO.getById(id); 
+            JsonResponse.send(resp, new LoginResponse(
+                "success", 
+                "Authenticated", 
+                user.getRole(), 
+                user.getId(), 
+                user.getName(), 
+                user.getNimNip()
+            ));
         } else {
             JsonResponse.error(resp, 401, "Not authenticated");
         }

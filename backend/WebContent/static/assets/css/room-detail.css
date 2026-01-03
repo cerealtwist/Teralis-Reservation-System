@@ -174,8 +174,11 @@
 /* Kartu Reservasi Hijau (Farand) */
 .event-card-green {
     position: absolute;
-    inset: 4px;
-    background-color: #48a068; /* Hijau sesuai desain */
+    /* Ubah inset menjadi top, left, dan right saja */
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    background-color: #48a068; 
     color: white;
     border-radius: 8px;
     padding: 8px;
