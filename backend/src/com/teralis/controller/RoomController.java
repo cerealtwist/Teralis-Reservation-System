@@ -24,7 +24,16 @@ public class RoomController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Cek apakah ada ID di URL (with PathUtil)
+        String pathInfo = req.getPathInfo();
+
+        //Ambil tipe unik jika path-nya adalah /types
+        if (pathInfo != null && pathInfo.equals("/types")) {
+            List<String> types = roomDAO.getDistinctTypes();
+            JsonResponse.send(resp, types);
+            return; // Hentikan eksekusi agar tidak lanjut ke logika ID
+        }
+
+        //Logika ID (Gunakan PathUtil seperti sebelumnya)
         int id = PathUtil.getIdFromUrl(req);
 
         if (id != -1) {
@@ -36,13 +45,18 @@ public class RoomController extends HttpServlet {
                 JsonResponse.error(resp, 404, "Ruangan tidak ditemukan");
             }
         } else {
-            // Jika !ID, ambil daftar ruangan (berdasarkan gedung atau semua)
+            // Logika List Ruangan (Semua atau per Gedung)
             String buildingIdParam = req.getParameter("building_id");
             List<Room> rooms;
 
             if (buildingIdParam != null && !buildingIdParam.isEmpty()) {
-                int buildingId = Integer.parseInt(buildingIdParam);
-                rooms = roomDAO.getRoomsByBuilding(buildingId); 
+                try {
+                    int buildingId = Integer.parseInt(buildingIdParam);
+                    rooms = roomDAO.getRoomsByBuilding(buildingId);
+                } catch (NumberFormatException e) {
+                    JsonResponse.error(resp, 400, "ID Gedung harus berupa angka");
+                    return;
+                }
             } else {
                 rooms = roomDAO.getAllRooms();
             }
@@ -63,8 +77,6 @@ public class RoomController extends HttpServlet {
             String buildingIdStr = req.getParameter("buildingId");
             String capacityStr = req.getParameter("capacity");
             String idStr = req.getParameter("id");
-            
-            // Parameter baru yang ditambahkan:
             String type = req.getParameter("type");
             String facilities = req.getParameter("facilities");
             String status = req.getParameter("status");
@@ -75,7 +87,6 @@ public class RoomController extends HttpServlet {
             // 2. Tentukan apakah aksi ini UPDATE atau CREATE
             if (pathInfo != null && pathInfo.contains("/update") && idStr != null) {
                 id = Integer.parseInt(idStr);
-                // AMBIL DATA LAMA: Agar field yang tidak diedit tidak hilang (Partial Update)
                 room = roomDAO.getRoomById(id);
                 if (room == null) {
                     JsonResponse.error(resp, 404, "Ruangan tidak ditemukan");
@@ -90,8 +101,6 @@ public class RoomController extends HttpServlet {
             if (name != null) room.setName(name);
             if (buildingIdStr != null) room.setBuildingId(Integer.parseInt(buildingIdStr));
             if (capacityStr != null) room.setCapacity(Integer.parseInt(capacityStr));
-            
-            // Set field tambahan:
             if (type != null) room.setType(type);
             if (facilities != null) room.setFacilities(facilities);
             if (status != null) room.setStatus(status);

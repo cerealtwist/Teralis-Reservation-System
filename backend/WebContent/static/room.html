@@ -96,12 +96,17 @@
         <option value="">Pilih Gedung</option>
       </select>
 
-      <input type="date" class="form-control" disabled>
-      <select class="form-select" disabled>
-        <option>Waktu</option>
+      <select class="form-select" id="typeSelect">
+        <option value="">Semua Tipe</option>
       </select>
 
-      <button class="btn-search" disabled>Cari Ruangan</button>
+      <div class="slider-wrapper">
+        <span class="slider-label">Min Kapasitas:</span>
+        <input type="range" id="capacitySlider" min="0" max="500" value="0" class="custom-slider">
+        <span id="capacityValue" class="slider-badge">0</span>
+      </div>
+
+      <button class="btn-search" id="btnFilter">Cari Ruangan</button>
     </div>
   </div>
 </section>

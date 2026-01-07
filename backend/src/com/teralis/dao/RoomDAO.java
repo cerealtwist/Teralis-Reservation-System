@@ -161,4 +161,22 @@ public class RoomDAO {
         r.setImageUrl(rs.getString("image_url"));
         return r;
     }
+
+    public List<String> getDistinctTypes() {
+        List<String> types = new ArrayList<>();
+        String sql = "SELECT DISTINCT type FROM rooms WHERE status = 'available'";
+        try (Connection conn = DBConnection.getConnection();
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                String type = rs.getString("type");
+                if (type != null && !type.isEmpty()) {
+                    types.add(type);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return types;
+    }
 }
