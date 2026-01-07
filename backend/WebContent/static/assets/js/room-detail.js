@@ -152,35 +152,55 @@ async function loadReservations(roomId) {
 
 function renderReservationsOnGrid(reservations) {
     reservations.forEach(res => {
-        if (res.status !== 'approved') return;
+        // 1. Filter Status (approved & pending)
+        const status = res.status ? res.status.toLowerCase() : '';
+        if (status !== 'approved' && status !== 'pending') return;
 
-        // 1. Pecah jam dan menit
+        // 2. Pembersihan format tanggal agar ID sel cocok
+        const cleanDate = res.date.split('T')[0].split(' ')[0];
+
+        // 3. Mapping Role ke Bahasa Indonesia agar lebih rapih
+        let displayedRole = "";
+        if (res.userRole) {
+            const roleLower = res.userRole.toLowerCase();
+            if (roleLower === 'student') {
+                displayedRole = "Mahasiswa";
+            } else if (roleLower === 'lecturer') {
+                displayedRole = "Dosen";
+            } else {
+                // Kapitalisasi huruf pertama jika role lain (admin, dsb)
+                displayedRole = roleLower.charAt(0).toUpperCase() + roleLower.slice(1);
+            }
+        }
+
+        // 4. Parsing Waktu & Durasi
         const [startH, startM] = res.startTime.split(':').map(Number);
         const [endH, endM] = res.endTime.split(':').map(Number);
 
-        // 2. Konversi ke format desimal jam (misal 02:45 -> 2.75)
         let startDecimal = startH + (startM / 60);
         let endDecimal = endH + (endM / 60);
-
-        // 3. SAFETY LOGIC: Jika durasi negatif, asumsikan itu adalah PM
-        // Contoh: 02:45 (2.75) - 09:00 (9.0) = -6.25 -> Tambahkan 12 jam menjadi 5.75 jam
-        if (endDecimal < startDecimal) {
-            endDecimal += 12;
-        }
+        if (endDecimal < startDecimal) endDecimal += 12;
 
         const duration = endDecimal - startDecimal;
 
-        // 4. Target ID sel berdasarkan jam mulai
-        const targetCellId = `cell-${res.date}-${startH.toString().padStart(2, '0')}`;
+        // 5. Target ID sel
+        const targetCellId = `cell-${cleanDate}-${startH.toString().padStart(2, '0')}`;
         const targetCell = document.getElementById(targetCellId);
         
         if (targetCell) {
-            // Berikan position absolute dan width agar tidak tergencet grid
+            // Kalkulasi posisi top jika mulai di menit tertentu (misal 07:30)
+            const topOffset = (startM / 60) * 100;
+
             targetCell.innerHTML = `
                 <div class="event-card-green shadow-sm" 
-                     style="height: calc(${duration * 100}% - 8px); z-index: 10; position: absolute; width: 95%; left: 2px;">
-                    <strong class="d-block text-truncate">${res.userName || 'User'} (${duration.toFixed(1)} jam)</strong>
-                    <small class="d-block opacity-75">${res.userRole || ''}</small>
+                     style="height: calc(${duration * 100}% - 8px); 
+                            top: calc(${topOffset}% + 4px);
+                            z-index: 10; 
+                            position: absolute; 
+                            width: 95%; 
+                            left: 2px;">
+                    <strong class="d-block text-truncate">${res.userName || 'User'}</strong>
+                    <small class="d-block opacity-75">${displayedRole}</small>
                     <hr class="my-1 opacity-25">
                     <p class="mb-0 small text-truncate" title="${res.reason}">${res.reason || 'Kegiatan'}</p>
                 </div>

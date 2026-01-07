@@ -147,13 +147,41 @@ public class ReservationController extends HttpServlet {
                 return;
             }
 
-            // Eksekusi Update ke Database
+            // VALIDASI SEBELUM APPROVE
+            if ("approved".equalsIgnoreCase(data.status)) {
+                // 1. Ambil data reservasi asli dari database
+                Reservation targetRes = reservationDAO.getById(id);
+                
+                if (targetRes == null) {
+                    JsonResponse.error(resp, 404, "Reservasi tidak ditemukan");
+                    return;
+                }
+
+                // 2. Cek apakah slot waktu tersebut masih kosong?
+                // Gunakan method baru yang ada parameter 'excludeId' (id)
+                boolean isAvailable = reservationDAO.isTimeSlotAvailable(
+                    targetRes.getRoomId(),
+                    targetRes.getDate(),
+                    targetRes.getStartTime(),
+                    targetRes.getEndTime(),
+                    id 
+                );
+
+                if (!isAvailable) {
+                    // 3. JIKA BENTROK: Tolak request admin!
+                    JsonResponse.error(resp, 409, "GAGAL: Ruangan sudah disetujui untuk orang lain di jam tersebut!");
+                    return; // Stop eksekusi, database tidak diupdate
+                }
+            }
+            // =============================================
+
+            // Eksekusi Update ke Database (Hanya jika lolos validasi di atas)
             boolean isUpdated = reservationDAO.updateStatus(id, data.status);
 
             if (isUpdated) {
                 JsonResponse.success(resp, "Status updated successfully to " + data.status);
             } else {
-                JsonResponse.error(resp, 500, "Gagal memperbarui status di database (ID tidak ditemukan)");
+                JsonResponse.error(resp, 500, "Gagal memperbarui status di database");
             }
         } catch (Exception e) {
             e.printStackTrace();

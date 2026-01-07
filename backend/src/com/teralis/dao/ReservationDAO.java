@@ -56,6 +56,56 @@ public class ReservationDAO {
         return list;
     }
 
+    // 1. TAMBAHKAN INI: Method untuk mengambil detail 1 reservasi
+    public Reservation getById(int id) {
+        String sql = "SELECT * FROM reservations WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return map(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Method Cek Bentrok Khusus Approval (Overloading)
+    // Mengecek ketersediaan TAPI mengabaikan reservasi dengan ID 'excludeId'
+    // agar tidak bentrok dengan dirinya sendiri saat dicek.
+    public boolean isTimeSlotAvailable(int roomId, Date date, Time start, Time end, int excludeId) {
+        String sql = """
+            SELECT COUNT(*) FROM reservations
+            WHERE room_id = ?
+            AND date = ?
+            AND status = 'approved'
+            AND id != ?  -- Abaikan ID reservasi yang sedang dicek
+            AND (
+                (start_time < ? AND end_time > ?) -- Logika Overlap
+            )
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            statement.setInt(1, roomId);
+            statement.setDate(2, date);
+            statement.setInt(3, excludeId);
+            statement.setTime(4, end);   // Start Existing < End New
+            statement.setTime(5, start); // End Existing > Start New
+
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) == 0; // Return TRUE jika count 0 (tidak ada bentrok)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public List<Reservation> getByRoom(int roomId) {
     List<Reservation> list = new ArrayList<>();
     // Query JOIN untuk mendapatkan data user sekaligus
