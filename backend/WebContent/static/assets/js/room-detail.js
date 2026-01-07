@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // HELPER: Fungsi untuk format tanggal YYYY-MM-DD berdasarkan waktu lokal (bukan UTC)
-// Analogi: Jika .toISOString() adalah jam dunia (London), fungsi ini adalah jam dinding di rumah Anda.
 function formatDateLocal(d) {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -37,15 +36,24 @@ function renderRoomInfo(room) {
     document.getElementById('breadcrumb-building-link').textContent = room.buildingName;
     document.getElementById('breadcrumb-room-active').textContent = room.name;
     
-    const defaultImg = `${window.CONTEXT_PATH}/assets/img/telu-building.png`;
-    const imgPath = room.imageUrl ? `${window.CONTEXT_PATH}/assets/img/${room.imageUrl}` : defaultImg;
+    // === PERBAIKAN PATH ===
+    // Path Default Image (Static)
+    const defaultImg = `${window.CONTEXT_PATH}/static/assets/img/telu-building.png`;
+    
+    // Path Uploaded Image (Dynamic via Controller)
+    const imgPath = room.imageUrl 
+        ? `${window.CONTEXT_PATH}/images/${room.imageUrl}` 
+        : defaultImg;
+        
     const imgElement = document.getElementById('img-main');
     
     imgElement.src = imgPath;
-    // Fallback otomatis jika gambar utama 404
+    
+    // Handler jika gambar upload tidak ditemukan (404), ganti ke default
     imgElement.onerror = function() {
-        this.src = defaultImg;
-        this.onerror = null; 
+        if (this.src !== defaultImg) {
+            this.src = defaultImg;
+        }
     };
 
     document.getElementById('btn-reservasi').href = `reservation.html?room_id=${room.id}`;
@@ -182,7 +190,7 @@ function renderReservationsOnGrid(reservations) {
         if (endDecimal < startDecimal) endDecimal += 12;
 
         const duration = endDecimal - startDecimal;
-
+        
         // 5. Target ID sel
         const targetCellId = `cell-${cleanDate}-${startH.toString().padStart(2, '0')}`;
         const targetCell = document.getElementById(targetCellId);

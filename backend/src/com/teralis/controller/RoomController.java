@@ -107,17 +107,24 @@ public class RoomController extends HttpServlet {
 
             // 4. LOGIKA UPLOAD GAMBAR
             Part filePart = req.getPart("image");
-            if (filePart != null && filePart.getSize() > 0) {
-                String originalName = filePart.getSubmittedFileName();
-                // Generate nama file unik dengan timestamp
-                String fileName = "room_" + System.currentTimeMillis() + "_" + originalName.replaceAll("\\s+", "_");
-                String uploadPath = getServletContext().getRealPath("/") + "assets" + File.separator + "img";
-                
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) uploadDir.mkdirs();
+                if (filePart != null && filePart.getSize() > 0) {
+                    String originalName = filePart.getSubmittedFileName();
+                    
+                    // Generate nama unik
+                    String fileName = "room_" + System.currentTimeMillis() + "_" + originalName.replaceAll("\\s+", "_");
+                    
+                    // === PERUBAHAN DI SINI ===
+                    // Path Folder Eksternal (Harus sama dengan ImageController)
+                    String uploadPath = "C:" + File.separator + "teralis_storage";
+                    
+                    // Pastikan folder ada
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) uploadDir.mkdirs();
 
-                filePart.write(uploadPath + File.separator + fileName);
-                room.setImageUrl(fileName); // Simpan nama file foto baru
+                    // Simpan file ke C:/teralis_storage/namafile.jpg
+                    filePart.write(uploadPath + File.separator + fileName);
+                    
+                    room.setImageUrl(fileName); 
             }
 
             // 5. EKSEKUSI KE DATABASE LEWAT DAO

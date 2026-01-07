@@ -41,7 +41,7 @@ async function loadRooms() {
         rooms.forEach(r => {
             tbody.innerHTML += `
                 <tr>
-                    <td><img src="../assets/img/${r.imageUrl || 'telu-building.png'}" class="img-preview-table"></td>
+                    <td><img src="../static/assets/img/${r.imageUrl || 'telu-building.png'}" class="img-preview-table"></td>
                     <td>
                         <div class="fw-bold">${r.name}</div>
                         <small class="text-muted">${r.type || 'General'}</small>

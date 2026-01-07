@@ -1,6 +1,6 @@
-const API_BASE_URL = "/WebContent/api";
+const API_BASE_URL = "/WebContent/api"; // Sesuaikan jika nama project di URL browser berbeda
 
-// variabel penampung data untuk keperluan filter tanpa hit API berulang
+// Variabel global untuk filter
 let allRoomsInBuilding = []; 
 
 async function loadBuildings() {
@@ -24,10 +24,8 @@ async function loadBuildings() {
   }
 }
 
-// Memuat tipe ruangan dari API getDistinctTypes
 async function loadRoomTypes() {
   try {
-    // Pastikan URL ini sesuai dengan mapping di RoomController (/api/rooms/types)
     const res = await fetch(`${API_BASE_URL}/rooms/types`);
     if (!res.ok) throw new Error("Gagal mengambil tipe ruangan");
     
@@ -46,11 +44,13 @@ async function loadRoomTypes() {
   }
 }
 
-// Fungsi Filter Gabungan (Tipe & Kapasitas)
 function applyFilters() {
   const selectedType = document.getElementById("typeSelect").value;
   const minCapacity = parseInt(document.getElementById("capacitySlider").value);
   const buildingSelect = document.getElementById("buildingSelect");
+  
+  if (buildingSelect.selectedIndex <= 0) return;
+  
   const buildingName = buildingSelect.options[buildingSelect.selectedIndex].text;
   const container = document.getElementById("room-list");
 
@@ -72,26 +72,33 @@ function applyFilters() {
   });
 }
 
-// Update tampilan angka slider
 document.getElementById("capacitySlider").addEventListener("input", e => {
   document.getElementById("capacityValue").textContent = e.target.value;
-  applyFilters(); // Filter otomatis saat slider digeser
+  applyFilters(); 
 });
 
 function roomCardTemplate(room, buildingName) {
-  // Logika Status Badge
   const statusClass = room.status === 'available' ? 'status-available' : 'status-maintenance';
   const statusText = room.status === 'available' ? 'Tersedia' : 'Perbaikan';
   
+  // === PERBAIKAN PATH ===
   const contextPath = "/WebContent"; 
-  const defaultImage = `${contextPath}/assets/img/telu-building.png`;
-  const imageSource = room.imageUrl ? `${contextPath}/assets/img/${room.imageUrl}` : defaultImage;
+  
+  // 1. Gambar Default (Static Asset) -> Pakai /static/assets/img
+  const defaultImage = `${contextPath}/static/assets/img/telu-building.png`; 
+  
+  // 2. Gambar Upload (Dynamic) -> Pakai /images/ (via ImageController)
+  // ImageController akan membaca dari C:/teralis_storage
+  const imageSource = room.imageUrl 
+        ? `${contextPath}/images/${room.imageUrl}` 
+        : defaultImage;
+  
   const detailUrl = `room-detail.html?id=${room.id}`;
 
   return `
     <div class="room-card" onclick="window.location.href='${detailUrl}'" style="cursor: pointer;">
       <div class="room-img-container">
-        <img src="${imageSource}" alt="${room.name}">
+        <img src="${imageSource}" alt="${room.name}" onerror="this.onerror=null;this.src='${defaultImage}';">
         <span class="room-badge ${statusClass}">${statusText}</span>
       </div>
       <div class="room-card-body">
@@ -118,7 +125,7 @@ async function loadRooms(buildingId, buildingName) {
     
     allRoomsInBuilding = rooms;
     document.getElementById("result-title").textContent = `Daftar Ruangan: ${buildingName}`;
-    applyFilters(); // Panggil applyFilters alih-alih merender manual
+    applyFilters(); 
   } catch (err) {
     console.error("Gagal memuat ruangan:", err);
   }
@@ -135,6 +142,5 @@ document.getElementById("buildingSelect").addEventListener("change", e => {
 
 document.getElementById("typeSelect").addEventListener("change", applyFilters);
 
-// Inisialisasi awal
 loadBuildings();
 loadRoomTypes();
