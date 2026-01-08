@@ -38,15 +38,33 @@ async function loadRooms() {
         const res = await fetch('../api/rooms');
         const rooms = await res.json();
         tbody.innerHTML = "";
+
+        // 1. Deteksi nama project otomatis dari URL browser
+        const pathArray = window.location.pathname.split('/');
+        const contextPath = pathArray[1] ? `/${pathArray[1]}` : "";
+        
+        // 2. Path Gambar Default (Static Assets)
+        const defaultImage = `${contextPath}/static/assets/img/telu-building.png`;
+
         rooms.forEach(r => {
+            // 3. Tentukan Source: Jika ada upload ke /images/, jika tidak ke default
+            const imageSource = r.imageUrl 
+                ? `${contextPath}/images/${r.imageUrl}` 
+                : defaultImage;
+
             tbody.innerHTML += `
                 <tr>
-                    <td><img src="../static/assets/img/${r.imageUrl || 'telu-building.png'}" class="img-preview-table"></td>
+                    <td>
+                        <img src="${imageSource}" 
+                             class="img-preview-table" 
+                             style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px;"
+                             onerror="this.onerror=null;this.src='${defaultImage}';">
+                    </td>
                     <td>
                         <div class="fw-bold">${r.name}</div>
                         <small class="text-muted">${r.type || 'General'}</small>
                     </td>
-                    <td>${r.buildingName}</td>
+                    <td>${r.buildingName || '-'}</td>
                     <td>${r.capacity} Orang</td>
                     <td>
                         <button class="btn btn-sm btn-light-primary" onclick="editRoom(${r.id})" title="Edit"><i class="ti ti-edit"></i></button>
@@ -69,6 +87,10 @@ async function openRoomModal() {
     document.getElementById('room-id').value = "";
     document.getElementById('roomModalTitle').innerText = "Tambah Ruangan";
     
+    // Reset preview gambar jika ada elemennya (opsional, menjaga agar tidak ada sisa gambar lama)
+    const previewImg = document.getElementById('preview-image'); // Pastikan ID ini ada di HTML modal jika ingin fitur ini
+    if(previewImg) previewImg.src = "";
+
     await loadBuildingOptions();
     new bootstrap.Modal(document.getElementById('roomModal')).show();
 }
