@@ -1,142 +1,231 @@
-document.addEventListener("DOMContentLoaded", function() {
-    fetchUserReservations();
+document.addEventListener("DOMContentLoaded", () => {
+    loadUserReservations();
 });
 
-// Inisialisasi Context Path
-window.CONTEXT_PATH = window.CONTEXT_PATH || '/WebContent';
+// === KONFIGURASI PATH (SAMA DENGAN ROOM.JS) ===
+const contextPath = "/WebContent"; 
+const defaultImage = `${contextPath}/static/assets/img/telu-building.png`;
 
-async function fetchUserReservations() {
+let allReservations = [];
+
+async function loadUserReservations() {
     try {
-        const res = await fetch(`${window.CONTEXT_PATH}/api/reservations`);
-        const list = await res.json();
+        // Mengambil data reservasi milik user yang sedang login
+        const res = await fetch(`${contextPath}/api/reservations/my`); 
+        
+        if (!res.ok) throw new Error("Gagal mengambil data reservasi");
 
-        const upcomingContainer = document.getElementById('upcoming-list');
-        const historyContainer = document.getElementById('history-list');
-
-        // Reset kontainer sebelum render (Avoid duplication)
-        if (upcomingContainer) upcomingContainer.innerHTML = "";
-        if (historyContainer) historyContainer.innerHTML = "";
-
-        list.forEach(item => {
-            const card = createReservationItem(item);
-            
-            // Menunggu & Disetujui masuk ke 'Upcoming', sisanya ke 'History'
-            if (item.status === 'pending' || item.status === 'approved') {
-                upcomingContainer.appendChild(card);
-            } else {
-                historyContainer.appendChild(card);
-            }
-        });
+        allReservations = await res.json();
+        renderLists(allReservations);
+        
     } catch (err) {
-        console.error("Gagal memuat status:", err);
+        console.error(err);
+        const upcomingContainer = document.getElementById("upcoming-list");
+        if(upcomingContainer) upcomingContainer.innerHTML = `<p class="text-danger small text-center">Gagal memuat data reservasi.</p>`;
     }
 }
 
-function createReservationItem(item) {
-    const div = document.createElement('div');
-    div.className = 'reservation-item';
+function renderLists(data) {
+    const upcomingContainer = document.getElementById("upcoming-list");
+    const historyContainer = document.getElementById("history-list");
+    
+    if (upcomingContainer) upcomingContainer.innerHTML = "";
+    if (historyContainer) historyContainer.innerHTML = "";
 
-    // Context path + Fallback telu-building.png
-    const defaultImg = `${window.CONTEXT_PATH}/assets/img/telu-building.png`;
-    const imgPath = item.roomImage ? `${window.CONTEXT_PATH}/assets/img/${item.roomImage}` : defaultImg;
+    const now = new Date(); 
 
-    div.innerHTML = `
-        <div class="d-flex gap-3 align-items-center">
-            <img src="${imgPath}" class="thumb" onerror="this.src='${defaultImg}'">
+    // Urutkan: Terbaru paling atas
+    data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    let hasUpcoming = false;
+    let hasHistory = false;
+
+    data.forEach(item => {
+        const itemDateTime = new Date(`${item.date}T${item.endTime}`);
+        const isHistory = itemDateTime < now || item.status === 'rejected' || item.status === 'cancelled';
+
+        // --- LOGIKA GAMBAR (SAMA DENGAN ROOM.JS) ---
+        // Jika item.roomImage ada, pakai /images/ (External). Jika tidak, pakai default.
+        const imageSource = item.roomImage 
+            ? `${contextPath}/images/${item.roomImage}` 
+            : defaultImage;
+
+        const cardHTML = `
+            <div class="card-status p-3 mb-2 bg-white rounded-3 border shadow-sm" 
+                 onclick="showDetail(${item.id})" 
+                 style="cursor: pointer; transition: all 0.2s;">
+                <div class="d-flex gap-3 align-items-center">
+                    <img src="${imageSource}" 
+                         class="rounded-3" 
+                         width="70" height="70" 
+                         style="object-fit: cover;"
+                         onerror="if(this.src !== '${defaultImage}') { this.onerror=null; this.src='${defaultImage}'; }">
+                    
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h6 class="fw-bold mb-0 text-truncate">${item.roomName || 'Ruangan'}</h6>
+                            ${getStatusBadge(item.status)}
+                        </div>
+                        <p class="text-muted small mb-1 text-truncate">${item.buildingName || 'Gedung Teralis'}</p>
+                        <div class="d-flex align-items-center gap-2 small text-muted">
+                            <img src="${contextPath}/static/assets/icons/calendar.svg" width="12" style="opacity: 0.6">
+                            <span>${item.date}</span>
+                            <span class="mx-1">•</span>
+                            <span>${item.startTime?.substring(0,5)} - ${item.endTime?.substring(0,5)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (isHistory) {
+            historyContainer.innerHTML += cardHTML;
+            hasHistory = true;
+        } else {
+            upcomingContainer.innerHTML += cardHTML;
+            hasUpcoming = true;
+        }
+    });
+
+    if (!hasUpcoming) upcomingContainer.innerHTML = `<div class="text-center py-4 text-muted small bg-white rounded-3 border border-dashed">Belum ada reservasi aktif</div>`;
+    if (!hasHistory) historyContainer.innerHTML = `<div class="text-center py-4 text-muted small bg-white rounded-3 border border-dashed">Belum ada riwayat</div>`;
+}
+
+function showDetail(id) {
+    const item = allReservations.find(r => r.id === id);
+    if (!item) return;
+
+    const detailCard = document.getElementById("detail-card");
+    const emptyState = document.getElementById("empty-state");
+
+    // --- LOGIKA GAMBAR DETAIL ---
+    const imageSource = item.roomImage 
+        ? `${contextPath}/images/${item.roomImage}` 
+        : defaultImage;
+
+    detailCard.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start mb-4">
             <div>
-                <small class="text-muted">${item.date} ${item.startTime.substring(0,5)}</small>
-                <div class="fw-bold">${item.roomName}</div>
-                <small class="text-muted">${item.buildingName}</small>
+                <h2 class="fw-bold mb-1">${item.roomName || 'Detail Ruangan'}</h2>
+                <p class="text-muted mb-0">${item.buildingName || 'Gedung Teralis'}</p>
+            </div>
+            ${getStatusBadge(item.status, true)}
+        </div>
+
+        <div class="rounded-4 overflow-hidden mb-4 border" style="height: 250px;">
+            <img src="${imageSource}" 
+                 class="w-100 h-100" 
+                 style="object-fit: cover;"
+                 onerror="if(this.src !== '${defaultImage}') { this.onerror=null; this.src='${defaultImage}'; }">
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-6">
+                <label class="small text-muted fw-bold mb-1">TANGGAL</label>
+                <div class="d-flex align-items-center gap-2">
+                    <img src="${contextPath}/static/assets/icons/calendar.svg" width="16">
+                    <span class="fw-medium">${item.date}</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <label class="small text-muted fw-bold mb-1">WAKTU</label>
+                <div class="d-flex align-items-center gap-2">
+                    <img src="${contextPath}/static/assets/icons/clock.svg" width="16">
+                    <span class="fw-medium">${item.startTime?.substring(0,5)} - ${item.endTime?.substring(0,5)} WIB</span>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="small text-muted fw-bold mb-1">KEPERLUAN</label>
+                <p class="mb-0 fw-medium text-dark">${item.reason || '-'}</p>
+            </div>
+            <div class="col-12">
+                <label class="small text-muted fw-bold mb-1">DOKUMEN PENDUKUNG</label>
+                <div>
+                    ${item.documentPath 
+                        ? `<a href="${contextPath}/uploads/${item.documentPath}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                             <i class="ti ti-file-text me-1"></i> Lihat Surat Pengajuan
+                           </a>` 
+                        : '<span class="text-muted fst-italic">Tidak ada dokumen dilampirkan</span>'}
+                </div>
             </div>
         </div>
+
+        ${item.status === 'pending' || item.status === 'approved' ? `
+            <hr class="my-4 opacity-10">
+            <div class="d-flex justify-content-end">
+                <button onclick="cancelReservation(${item.id})" class="btn btn-danger rounded-pill px-4 fw-bold">
+                    Batalkan Reservasi
+                </button>
+            </div>
+        ` : ''}
     `;
 
-    div.onclick = () => {
-        document.querySelectorAll('.reservation-item').forEach(i => i.classList.remove('active'));
-        div.classList.add('active');
-        showDetail(item);
-    };
-
-    return div;
+    // Toggle tampilan
+    if(emptyState) emptyState.classList.add("d-none");
+    if(detailCard) detailCard.classList.remove("d-none");
+    
+    // Scroll ke detail jika di mobile
+    if (window.innerWidth < 768 && detailCard) {
+        detailCard.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 async function cancelReservation(id) {
-    // Validasi objektif: Pastikan user benar-benar ingin membatalkan
     if (!confirm("Apakah Anda yakin ingin membatalkan reservasi ini?")) return;
 
     try {
-        // DELETE harus absolut mengarah ke ReservationController
-        const res = await fetch(`${window.CONTEXT_PATH}/api/reservations/${id}`, {
+        const res = await fetch(`${contextPath}/api/reservations/${id}`, {
             method: 'DELETE'
         });
 
-        const result = await res.json();
-
         if (res.ok) {
             alert("Reservasi berhasil dibatalkan.");
-            window.location.reload();
+            loadUserReservations(); // Reload data
+            
+            // Reset tampilan kanan
+            const detailCard = document.getElementById("detail-card");
+            const emptyState = document.getElementById("empty-state");
+            if(detailCard) detailCard.classList.add("d-none");
+            if(emptyState) emptyState.classList.remove("d-none");
         } else {
-            alert("Gagal membatalkan: " + result.message);
+            const err = await res.json();
+            alert("Gagal membatalkan: " + (err.message || "Error server"));
         }
-    } catch (err) {
-        console.error("Error cancel:", err);
-        alert("Terjadi kesalahan koneksi.");
+    } catch (e) {
+        alert("Gagal menghubungi server");
     }
 }
 
-function showDetail(item) {
-    const detailCard = document.getElementById('detail-card');
-    const emptyState = document.getElementById('empty-state');
+function getStatusBadge(status, isLarge = false) {
+    let colorClass = "";
+    let label = "";
+    let icon = "";
+
+    switch (status) {
+        case 'pending':
+            colorClass = "bg-warning text-dark bg-opacity-25 text-warning-emphasis border-warning";
+            label = "Menunggu Konfirmasi";
+            break;
+        case 'approved':
+            colorClass = "bg-success text-success bg-opacity-10 border-success";
+            label = "Disetujui";
+            break;
+        case 'rejected':
+            colorClass = "bg-danger text-danger bg-opacity-10 border-danger";
+            label = "Ditolak";
+            break;
+        case 'cancelled':
+            colorClass = "bg-secondary text-secondary bg-opacity-10 border-secondary";
+            label = "Dibatalkan";
+            break;
+        default:
+            colorClass = "bg-light text-muted border";
+            label = status;
+    }
+
+    const sizeClass = isLarge ? "px-3 py-2 rounded-pill border" : "badge rounded-pill border";
     
-    // UI Logic: Sembunyikan empty state dan tampilkan card detail
-    if (emptyState) {
-        emptyState.classList.remove('d-flex');
-        emptyState.classList.add('d-none');
-    }
-
-    if (detailCard) {
-        detailCard.classList.remove('d-none');
-    }
-
-    // Pemetaan warna badge berdasarkan status dari database
-    const statusBadge = item.status === 'pending' ? 'bg-warning' : (item.status === 'approved' ? 'bg-success' : 'bg-danger');
-    const statusText = item.status === 'pending' ? 'Menunggu' : (item.status === 'approved' ? 'Disetujui' : 'Ditolak');
-
-    // Jalur gambar untuk tampilan detail utama
-    const defaultImg = `${window.CONTEXT_PATH}/assets/img/telu-building.png`;
-    const imgPath = item.roomImage ? `${window.CONTEXT_PATH}/assets/img/${item.roomImage}` : defaultImg;
-
-    detailCard.innerHTML = `
-        <h2 class="fw-bold mb-4">${item.date} at ${item.startTime.substring(0,5)}</h2>
-        <span class="badge ${statusBadge} px-3 py-2 rounded-pill mb-4">${statusText}</span>
-        
-        <div class="d-flex justify-content-between align-items-start mb-4">
-            <div class="d-flex gap-4">
-                <img src="${imgPath}" onerror="this.src='${defaultImg}'" width="120" height="120" class="rounded-4 shadow-sm object-fit-cover">
-                <div>
-                    <h4 class="fw-bold mb-1">${item.roomName}</h4>
-                    <p class="text-muted mb-1">${item.buildingName}</p>
-                    <small class="text-muted">ID Reservasi #: ${item.id.toString().padStart(6, '0')}</small>
-                </div>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-light rounded-3 p-3 text-center border shadow-sm">
-                    <img src="${window.CONTEXT_PATH}/static/assets/icons/calendar.svg" width="20"><br><small>Reschedule</small>
-                </button>
-                <button class="btn btn-light rounded-3 p-3 text-center text-danger border shadow-sm" onclick="cancelReservation(${item.id})">
-                    <img src="${window.CONTEXT_PATH}/static/assets/icons/clock.svg" width="20" style="filter: invert(21%) sepia(100%) saturate(7414%) hue-rotate(354deg) brightness(92%) contrast(93%);"><br><small>Cancel</small>
-                </button>
-            </div>
-        </div>
-
-        <div class="p-4 bg-light rounded-4 mb-4 border">
-            <h6 class="fw-bold mb-3">Kegiatan: ${item.reason}</h6>
-            <p class="mb-0 text-muted">${item.startTime.substring(0,5)} - ${item.endTime.substring(0,5)}</p>
-        </div>
-
-        <div class="small text-muted border-top pt-3">
-            <strong>Cancellation policy</strong><br>
-            Pembatalan dapat dilakukan maksimal 24 jam sebelum waktu pemakaian.
-        </div>
-    `;
+    return `<span class="${sizeClass} ${colorClass} d-inline-flex align-items-center gap-1">
+                ${icon} ${label.toUpperCase()}
+            </span>`;
 }
