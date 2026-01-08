@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Muat data reservasi pertama kali
     loadReservations();
     
     // Listener Filter
@@ -39,15 +38,16 @@ async function loadRooms() {
         const rooms = await res.json();
         tbody.innerHTML = "";
 
-        // 1. Deteksi nama project otomatis dari URL browser
-        const pathArray = window.location.pathname.split('/');
-        const contextPath = pathArray[1] ? `/${pathArray[1]}` : "";
+        // Gunakan path absolut yang sama persis dengan room.js agar konsisten
+        const contextPath = "/WebContent"; 
         
-        // 2. Path Gambar Default (Static Assets)
+        // Path Default (Sesuai instruksi: WebContent/static/assets/img)
         const defaultImage = `${contextPath}/static/assets/img/telu-building.png`;
 
         rooms.forEach(r => {
-            // 3. Tentukan Source: Jika ada upload ke /images/, jika tidak ke default
+            // Logika Source: 
+            // 1. Uploaded Image -> Panggil Controller (/images/...)
+            // 2. Default Image -> Panggil folder static
             const imageSource = r.imageUrl 
                 ? `${contextPath}/images/${r.imageUrl}` 
                 : defaultImage;
@@ -57,7 +57,7 @@ async function loadRooms() {
                     <td>
                         <img src="${imageSource}" 
                              class="img-preview-table" 
-                             style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px;"
+                             style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;"
                              onerror="this.onerror=null;this.src='${defaultImage}';">
                     </td>
                     <td>
@@ -87,9 +87,11 @@ async function openRoomModal() {
     document.getElementById('room-id').value = "";
     document.getElementById('roomModalTitle').innerText = "Tambah Ruangan";
     
-    // Reset preview gambar jika ada elemennya (opsional, menjaga agar tidak ada sisa gambar lama)
-    const previewImg = document.getElementById('preview-image'); // Pastikan ID ini ada di HTML modal jika ingin fitur ini
+    // Reset preview gambar
+    const previewImg = document.getElementById('preview-image'); 
+    const previewContainer = document.getElementById('preview-container');
     if(previewImg) previewImg.src = "";
+    if(previewContainer) previewContainer.style.display = 'none';
 
     await loadBuildingOptions();
     new bootstrap.Modal(document.getElementById('roomModal')).show();
@@ -115,23 +117,18 @@ document.getElementById('roomForm').onsubmit = async (e) => {
     const formData = new FormData();
     const id = document.getElementById('room-id').value;
 
-    // Menambahkan field dasar
     formData.append("name", document.getElementById('room-name').value);
     formData.append("buildingId", document.getElementById('room-building').value);
     formData.append("capacity", document.getElementById('room-capacity').value);
-    
-    // MENAMBAHKAN FIELD BARU (Type, Facilities, Status)
     formData.append("type", document.getElementById('room-type').value);
     formData.append("facilities", document.getElementById('room-facilities').value);
     formData.append("status", document.getElementById('room-status').value);
     
-    // Menambahkan file gambar jika ada
     const fileInput = document.getElementById('room-image');
     if (fileInput.files[0]) {
         formData.append("image", fileInput.files[0]);
     }
 
-    // Jika ada ID, arahkan ke endpoint update, jika tidak maka create
     const url = id ? `../api/rooms/update?id=${id}` : `../api/rooms`;
 
     try {
@@ -166,14 +163,31 @@ async function editRoom(id) {
         document.getElementById('room-id').value = r.id;
         document.getElementById('room-name').value = r.name;
         document.getElementById('room-capacity').value = r.capacity;
-        
-        // MENGISI FIELD BARU KE MODAL
         document.getElementById('room-type').value = r.type || "";
         document.getElementById('room-facilities').value = r.facilities || "";
         document.getElementById('room-status').value = r.status || "available";
         
         await loadBuildingOptions();
         document.getElementById('room-building').value = r.buildingId;
+
+        // === PERBAIKAN PREVIEW DI MODAL ===
+        // Menggunakan logika absolut yang sama dengan loadRooms
+        const previewImg = document.getElementById('preview-image');
+        const previewContainer = document.getElementById('preview-container');
+        
+        if (previewImg) {
+            const contextPath = "/WebContent"; 
+            const defaultImage = `${contextPath}/static/assets/img/telu-building.png`;
+            
+            const imageSource = r.imageUrl 
+                ? `${contextPath}/images/${r.imageUrl}` 
+                : defaultImage;
+            
+            previewImg.src = imageSource;
+            previewImg.onerror = function() { this.src = defaultImage; };
+            
+            if(previewContainer) previewContainer.style.display = 'block';
+        }
         
         new bootstrap.Modal(document.getElementById('roomModal')).show();
     } catch (err) {
@@ -197,7 +211,7 @@ async function deleteRoom(id) {
 }
 
 /**
- * LOAD RESERVASI: Fetch + Filter (Status & Date)
+ * LOAD RESERVASI
  */
 async function loadReservations() {
     const filterStatus = document.getElementById('filterStatus').value;
@@ -257,7 +271,7 @@ async function loadReservations() {
 }
 
 /**
- * LOAD USERS: Fetch + Filter Role
+ * LOAD USERS
  */
 async function loadUsers() {
     const filterRole = document.getElementById('filterRole').value;
@@ -294,9 +308,6 @@ async function loadUsers() {
     } catch (err) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-warning">${err.message}</td></tr>`; }
 }
 
-/**
- * HELPERS: Warna Status & Role
- */
 function getStatusClass(status) {
     if (status === 'pending') return 'bg-warning text-dark';
     if (status === 'approved') return 'bg-success';
@@ -309,9 +320,6 @@ function getRoleClass(role) {
     return 'bg-light-primary text-primary';
 }
 
-/**
- * UPDATE RESERVATION STATUS (Approve/Reject)
- */
 async function updateStatus(id, newStatus) {
     if (!confirm(`Ubah status reservasi menjadi ${newStatus.toUpperCase()}?`)) return;
     try {
